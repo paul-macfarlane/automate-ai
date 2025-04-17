@@ -36,7 +36,7 @@ export default async function Home() {
 
       {!session?.user ? (
         <div className="flex flex-1 flex-col">
-          <section className="container mx-auto grid gap-8 py-16 md:grid-cols-2 md:py-24">
+          <section className="container mx-auto grid gap-8 py-16 md:grid-cols-2 md:py-24 px-4">
             <div className="flex flex-col justify-center space-y-6">
               <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-foreground">
                 Automate Your{" "}
