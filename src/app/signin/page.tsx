@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { SignInButton } from "../../components/signin-button";
+import { SignInButton } from "@/components/signin-button";
 
 export default function SignIn() {
   return (
