@@ -7,16 +7,20 @@ export default async function Home() {
   const session = await auth();
 
   return (
-    <main className="flex min-h-screen flex-col bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950">
-      <nav className="w-full border-b bg-white/70 backdrop-blur-md dark:bg-gray-950/70 dark:border-gray-800">
+    <main className="flex min-h-screen flex-col bg-background">
+      <nav className="w-full border-b border-border bg-background/70 backdrop-blur-md">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold">Automanager</span>
+            <span className="text-xl font-bold text-foreground">
+              Automanager
+            </span>
           </div>
           <div className="flex items-center gap-3">
             {session?.user ? (
               <>
-                <p className="hidden sm:block">Welcome, {session.user.name}</p>
+                <p className="hidden sm:block text-foreground">
+                  Welcome, {session.user.name}
+                </p>
                 <SignOutButton />
               </>
             ) : (
@@ -32,11 +36,11 @@ export default async function Home() {
         <div className="flex flex-1 flex-col">
           <section className="container mx-auto grid gap-8 py-16 md:grid-cols-2 md:py-24">
             <div className="flex flex-col justify-center space-y-6">
-              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
+              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-foreground">
                 Automate Your{" "}
                 <span className="text-primary">Project Management</span>
               </h1>
-              <p className="text-xl text-gray-600 dark:text-gray-400">
+              <p className="text-xl text-muted-foreground">
                 Streamline your workflow with AI-powered roadmaps, task
                 management, and analytics.
               </p>
@@ -51,9 +55,9 @@ export default async function Home() {
             </div>
             <div className="flex items-center justify-center">
               <div className="relative h-[300px] w-[400px] overflow-hidden rounded-lg shadow-xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 opacity-80"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-chart-1 via-chart-4 to-chart-5 opacity-80"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="p-6 text-center text-white">
+                  <div className="p-6 text-center text-primary-foreground">
                     <h3 className="text-2xl font-bold">
                       Generate roadmaps with AI
                     </h3>
@@ -66,11 +70,13 @@ export default async function Home() {
             </div>
           </section>
 
-          <section id="features" className="bg-gray-50 py-16 dark:bg-gray-900">
+          <section id="features" className="bg-muted py-16">
             <div className="container mx-auto px-4">
-              <h2 className="mb-12 text-center text-3xl font-bold">Features</h2>
+              <h2 className="mb-12 text-center text-3xl font-bold text-foreground">
+                Features
+              </h2>
               <div className="grid gap-8 md:grid-cols-3">
-                <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
+                <div className="rounded-lg bg-card p-6 shadow-md">
                   <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 p-2 text-primary">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -87,15 +93,15 @@ export default async function Home() {
                       />
                     </svg>
                   </div>
-                  <h3 className="mb-2 text-xl font-semibold">
+                  <h3 className="mb-2 text-xl font-semibold text-card-foreground">
                     AI Roadmap Generator
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
+                  <p className="text-muted-foreground">
                     Automatically generate project roadmaps based on your
                     requirements and goals.
                   </p>
                 </div>
-                <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
+                <div className="rounded-lg bg-card p-6 shadow-md">
                   <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 p-2 text-primary">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -112,15 +118,15 @@ export default async function Home() {
                       />
                     </svg>
                   </div>
-                  <h3 className="mb-2 text-xl font-semibold">
+                  <h3 className="mb-2 text-xl font-semibold text-card-foreground">
                     Analytics Dashboard
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
+                  <p className="text-muted-foreground">
                     Track project progress with real-time analytics and
                     insightful visualizations.
                   </p>
                 </div>
-                <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
+                <div className="rounded-lg bg-card p-6 shadow-md">
                   <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 p-2 text-primary">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -137,10 +143,10 @@ export default async function Home() {
                       />
                     </svg>
                   </div>
-                  <h3 className="mb-2 text-xl font-semibold">
+                  <h3 className="mb-2 text-xl font-semibold text-card-foreground">
                     Team Collaboration
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
+                  <p className="text-muted-foreground">
                     Collaborate with your team in real-time with shared
                     workspaces and task assignments.
                   </p>
@@ -156,33 +162,33 @@ export default async function Home() {
                 What Our Users Say
               </h2>
               <div className="grid gap-8 md:grid-cols-2">
-                <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
-                  <p className="mb-4 italic text-gray-600 dark:text-gray-300">
+                <div className="rounded-lg bg-card p-6 shadow-md">
+                  <p className="mb-4 italic text-muted-foreground">
                     &ldquo;Automanager completely transformed how we manage
                     projects. The AI roadmap generator saved us countless hours
                     of planning.&rdquo;
                   </p>
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    <div className="h-12 w-12 rounded-full bg-muted"></div>
                     <div>
-                      <h4 className="font-semibold">Sarah Johnson</h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <h4 className="font-semibold text-card-foreground">Sarah Johnson</h4>
+                      <p className="text-sm text-muted-foreground">
                         Project Manager, TechCorp
                       </p>
                     </div>
                   </div>
                 </div>
-                <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
-                  <p className="mb-4 italic text-gray-600 dark:text-gray-300">
+                <div className="rounded-lg bg-card p-6 shadow-md">
+                  <p className="mb-4 italic text-muted-foreground">
                     &ldquo;The analytics dashboard gives us real-time insights
                     into our project progress. It&rsquo;s been invaluable for
                     keeping our stakeholders informed.&rdquo;
                   </p>
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    <div className="h-12 w-12 rounded-full bg-muted"></div>
                     <div>
-                      <h4 className="font-semibold">Michael Chen</h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <h4 className="font-semibold text-card-foreground">Michael Chen</h4>
+                      <p className="text-sm text-muted-foreground">
                         CTO, StartupX
                       </p>
                     </div>
@@ -192,37 +198,37 @@ export default async function Home() {
             </div>
           </section> */}
 
-          <section className="bg-primary py-16 text-white">
+          <section className="bg-primary py-16">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="mb-6 text-3xl font-bold">
+              <h2 className="mb-6 text-3xl font-bold text-primary-foreground">
                 Ready to Streamline Your Project Management?
               </h2>
-              <p className="mb-8 text-xl">
+              <p className="mb-8 text-xl text-primary-foreground">
                 Join thousands of teams already using Automanager to supercharge
                 their productivity.
               </p>
               <Button
                 size="lg"
                 asChild
-                className="bg-white text-primary hover:bg-gray-100"
+                className="bg-background text-primary hover:bg-muted"
               >
                 <Link href="/signin">Get Started for Free</Link>
               </Button>
             </div>
           </section>
 
-          <footer className="bg-gray-900 py-8 text-white">
+          <footer className="bg-card py-8 text-card-foreground">
             <div className="container mx-auto px-4">
               <div className="grid gap-8 md:grid-cols-2">
                 <div>
                   <h3 className="mb-4 text-lg font-semibold">Automanager</h3>
-                  <p className="text-gray-400">
+                  <p className="text-muted-foreground">
                     Automated project management tools for your needs
                   </p>
                 </div>
                 <div>
                   <h3 className="mb-4 text-lg font-semibold">Features</h3>
-                  <ul className="space-y-2 text-gray-400">
+                  <ul className="space-y-2 text-muted-foreground">
                     <li>Roadmap Generator</li>
                     <li>Analytics Dashboard</li>
                     <li>Team Collaboration</li>
@@ -235,27 +241,33 @@ export default async function Home() {
       ) : (
         <div className="container mx-auto px-4 py-12">
           <div className="mb-12 text-center">
-            <h1 className="text-4xl font-bold mb-4">
+            <h1 className="text-4xl font-bold mb-4 text-foreground">
               Welcome to Your Dashboard
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Manage your projects with our suite of automated tools
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 w-full">
-            <div className="border rounded-lg p-6 hover:shadow-md transition-shadow">
-              <h2 className="text-2xl font-semibold mb-2">Roadmap Generator</h2>
-              <p className="mb-4">
+            <div className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow bg-card">
+              <h2 className="text-2xl font-semibold mb-2 text-card-foreground">
+                Roadmap Generator
+              </h2>
+              <p className="mb-4 text-muted-foreground">
                 Create automated project roadmaps based on your requirements
               </p>
               <Button asChild className="w-full">
                 <Link href="/roadmap">Create Roadmap</Link>
               </Button>
             </div>
-            <div className="border rounded-lg p-6 hover:shadow-md transition-shadow">
-              <h2 className="text-2xl font-semibold mb-2">Project Dashboard</h2>
-              <p className="mb-4">Visualize your projects and track progress</p>
+            <div className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow bg-card">
+              <h2 className="text-2xl font-semibold mb-2 text-card-foreground">
+                Project Dashboard
+              </h2>
+              <p className="mb-4 text-muted-foreground">
+                Visualize your projects and track progress
+              </p>
               <Button asChild className="w-full">
                 <Link href="/dashboard">View Dashboard</Link>
               </Button>
