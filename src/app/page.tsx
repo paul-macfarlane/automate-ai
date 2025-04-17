@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { SignOutButton } from "@/components/signout-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function Home() {
   const session = await auth();
@@ -16,6 +17,7 @@ export default async function Home() {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             {session?.user ? (
               <>
                 <p className="hidden sm:block text-foreground">

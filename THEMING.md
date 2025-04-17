@@ -30,6 +30,29 @@ For data visualizations, use these variables:
 
 - `bg-chart-1` through `bg-chart-5`
 
+## Dark Mode
+
+Automanager supports system preference detection, light mode, and dark mode. The implementation uses:
+
+1. **next-themes** - For theme management
+2. **CSS Variables** - For applying different colors based on the theme
+3. **ThemeProvider** - Wraps the application to provide theme context
+4. **ThemeToggle** - UI component to switch between themes
+
+### How it works
+
+- Theme settings are saved to localStorage
+- A script in the document head prevents flash of incorrect theme
+- Default is set to follow the system preference
+- Users can manually select light/dark/system from the theme toggle
+
+### Adding Dark Mode to New Pages
+
+All pages are automatically dark mode compatible when using the theme CSS variables. Just ensure:
+
+1. Always include the `<ThemeToggle />` component in the page navigation
+2. Use theme variables for colors (avoid hardcoded colors)
+
 ## Usage Guidelines
 
 1. **Always use theme variables** instead of hardcoded colors:
