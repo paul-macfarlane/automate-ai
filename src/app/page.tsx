@@ -7,38 +7,242 @@ export default async function Home() {
   const session = await auth();
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-12">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          <span>Automanager</span>
-        </p>
-        <div className="flex items-center gap-3">
-          {session?.user ? (
-            <>
-              <p className="hidden sm:block">Welcome, {session.user.name}</p>
-              <SignOutButton />
-            </>
-          ) : (
-            <Button asChild>
-              <Link href="/signin">Sign In</Link>
-            </Button>
-          )}
+    <main className="flex min-h-screen flex-col bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950">
+      <nav className="w-full border-b bg-white/70 backdrop-blur-md dark:bg-gray-950/70 dark:border-gray-800">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold">Automanager</span>
+          </div>
+          <div className="flex items-center gap-3">
+            {session?.user ? (
+              <>
+                <p className="hidden sm:block">Welcome, {session.user.name}</p>
+                <SignOutButton />
+              </>
+            ) : (
+              <Button asChild>
+                <Link href="/signin">Sign In</Link>
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
+      </nav>
 
-      <div className="mt-24 flex max-w-5xl flex-col items-center text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Automanager</h1>
-        <p className="max-w-2xl text-xl mb-8">
-          The all-in-one solution for automated project management
-        </p>
+      {!session?.user ? (
+        <div className="flex flex-1 flex-col">
+          <section className="container mx-auto grid gap-8 py-16 md:grid-cols-2 md:py-24">
+            <div className="flex flex-col justify-center space-y-6">
+              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
+                Automate Your{" "}
+                <span className="text-primary">Project Management</span>
+              </h1>
+              <p className="text-xl text-gray-600 dark:text-gray-400">
+                Streamline your workflow with AI-powered roadmaps, task
+                management, and analytics.
+              </p>
+              <div className="flex gap-4">
+                <Button size="lg" asChild>
+                  <Link href="/signin">Get Started</Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link href="#features">Learn More</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="flex items-center justify-center">
+              <div className="relative h-[300px] w-[400px] overflow-hidden rounded-lg shadow-xl">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 opacity-80"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="p-6 text-center text-white">
+                    <h3 className="text-2xl font-bold">
+                      Generate roadmaps with AI
+                    </h3>
+                    <p className="mt-2">
+                      Turn your ideas into actionable project plans
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
 
-        {!session?.user && (
-          <Button size="lg" asChild className="mt-4">
-            <Link href="/signin">Get Started</Link>
-          </Button>
-        )}
+          <section id="features" className="bg-gray-50 py-16 dark:bg-gray-900">
+            <div className="container mx-auto px-4">
+              <h2 className="mb-12 text-center text-3xl font-bold">Features</h2>
+              <div className="grid gap-8 md:grid-cols-3">
+                <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
+                  <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 p-2 text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="h-8 w-8"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="mb-2 text-xl font-semibold">
+                    AI Roadmap Generator
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Automatically generate project roadmaps based on your
+                    requirements and goals.
+                  </p>
+                </div>
+                <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
+                  <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 p-2 text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="h-8 w-8"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="mb-2 text-xl font-semibold">
+                    Analytics Dashboard
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Track project progress with real-time analytics and
+                    insightful visualizations.
+                  </p>
+                </div>
+                <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
+                  <div className="mb-4 h-12 w-12 rounded-full bg-primary/10 p-2 text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="h-8 w-8"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="mb-2 text-xl font-semibold">
+                    Team Collaboration
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Collaborate with your team in real-time with shared
+                    workspaces and task assignments.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
 
-        {session?.user && (
+          {/* TODO: Add testimonials at a later date when there are real users */}
+          {/* <section className="py-16">
+            <div className="container mx-auto px-4">
+              <h2 className="mb-12 text-center text-3xl font-bold">
+                What Our Users Say
+              </h2>
+              <div className="grid gap-8 md:grid-cols-2">
+                <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
+                  <p className="mb-4 italic text-gray-600 dark:text-gray-300">
+                    &ldquo;Automanager completely transformed how we manage
+                    projects. The AI roadmap generator saved us countless hours
+                    of planning.&rdquo;
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    <div>
+                      <h4 className="font-semibold">Sarah Johnson</h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Project Manager, TechCorp
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
+                  <p className="mb-4 italic text-gray-600 dark:text-gray-300">
+                    &ldquo;The analytics dashboard gives us real-time insights
+                    into our project progress. It&rsquo;s been invaluable for
+                    keeping our stakeholders informed.&rdquo;
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    <div>
+                      <h4 className="font-semibold">Michael Chen</h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        CTO, StartupX
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section> */}
+
+          <section className="bg-primary py-16 text-white">
+            <div className="container mx-auto px-4 text-center">
+              <h2 className="mb-6 text-3xl font-bold">
+                Ready to Streamline Your Project Management?
+              </h2>
+              <p className="mb-8 text-xl">
+                Join thousands of teams already using Automanager to supercharge
+                their productivity.
+              </p>
+              <Button
+                size="lg"
+                asChild
+                className="bg-white text-primary hover:bg-gray-100"
+              >
+                <Link href="/signin">Get Started for Free</Link>
+              </Button>
+            </div>
+          </section>
+
+          <footer className="bg-gray-900 py-8 text-white">
+            <div className="container mx-auto px-4">
+              <div className="grid gap-8 md:grid-cols-2">
+                <div>
+                  <h3 className="mb-4 text-lg font-semibold">Automanager</h3>
+                  <p className="text-gray-400">
+                    Automated project management tools for your needs
+                  </p>
+                </div>
+                <div>
+                  <h3 className="mb-4 text-lg font-semibold">Features</h3>
+                  <ul className="space-y-2 text-gray-400">
+                    <li>Roadmap Generator</li>
+                    <li>Analytics Dashboard</li>
+                    <li>Team Collaboration</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </footer>
+        </div>
+      ) : (
+        <div className="container mx-auto px-4 py-12">
+          <div className="mb-12 text-center">
+            <h1 className="text-4xl font-bold mb-4">
+              Welcome to Your Dashboard
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Manage your projects with our suite of automated tools
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 w-full">
             <div className="border rounded-lg p-6 hover:shadow-md transition-shadow">
               <h2 className="text-2xl font-semibold mb-2">Roadmap Generator</h2>
@@ -57,8 +261,8 @@ export default async function Home() {
               </Button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </main>
   );
 }
