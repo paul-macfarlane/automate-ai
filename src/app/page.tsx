@@ -1,52 +1,14 @@
-/* eslint-disable @next/next/no-img-element */
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { SignOutButton } from "@/components/signout-button";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Navbar } from "@/components/navbar";
 
 export default async function Home() {
   const session = await auth();
 
-  // todo this should be updated to use avatar component
-
   return (
     <main className="flex min-h-screen flex-col bg-background">
-      <nav className="w-full border-b border-border bg-background/70 backdrop-blur-md">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-foreground">
-              Automanager
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            {session?.user ? (
-              <>
-                <Button variant="outline" asChild>
-                  <Link href="/profile" className="flex items-center gap-2">
-                    {session.user.image && (
-                      <div className="h-6 w-6 rounded-full overflow-hidden">
-                        <img
-                          src={session.user.image}
-                          alt="Profile"
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                    )}
-                    <span className="hidden sm:block">Profile</span>
-                  </Link>
-                </Button>
-                <SignOutButton />
-              </>
-            ) : (
-              <Button asChild>
-                <Link href="/signin">Sign In</Link>
-              </Button>
-            )}
-          </div>
-        </div>
-      </nav>
+      <Navbar user={session?.user || null} />
 
       {!session?.user ? (
         <div className="flex flex-1 flex-col">

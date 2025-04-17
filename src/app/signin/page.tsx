@@ -7,24 +7,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SignInButton } from "@/components/signin-button";
-import { ThemeToggle } from "@/components/theme-toggle";
-import Link from "next/link";
+import { Navbar } from "@/components/navbar";
 
 export default function SignIn() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <nav className="w-full border-b border-border bg-background/70 backdrop-blur-md">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="text-xl font-bold text-foreground">
-              Automanager
-            </Link>
-          </div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-          </div>
-        </div>
-      </nav>
+      <Navbar user={null} />
 
       <div className="flex flex-1 items-center justify-center">
         <Card className="w-full max-w-md">
