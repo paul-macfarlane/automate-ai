@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -6,6 +7,8 @@ import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function Home() {
   const session = await auth();
+
+  // todo this should be updated to use avatar component
 
   return (
     <main className="flex min-h-screen flex-col bg-background">
@@ -20,9 +23,20 @@ export default async function Home() {
             <ThemeToggle />
             {session?.user ? (
               <>
-                <p className="hidden sm:block text-foreground">
-                  Welcome, {session.user.name}
-                </p>
+                <Button variant="outline" asChild>
+                  <Link href="/profile" className="flex items-center gap-2">
+                    {session.user.image && (
+                      <div className="h-6 w-6 rounded-full overflow-hidden">
+                        <img
+                          src={session.user.image}
+                          alt="Profile"
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    )}
+                    <span className="hidden sm:block">Profile</span>
+                  </Link>
+                </Button>
                 <SignOutButton />
               </>
             ) : (
