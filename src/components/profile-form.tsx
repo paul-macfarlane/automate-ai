@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState } from "react";
@@ -10,6 +9,7 @@ import {
 } from "@/lib/validations/profile";
 import { updateProfile } from "@/actions/profile";
 import { toast } from "sonner";
+import { getInitials } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ProfileFormProps {
   initialFormValues: ProfileFormValues;
@@ -59,8 +60,7 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
 
   // Watch the image field to display preview
   const imageUrl = form.watch("image");
-
-  // todo this should be updated to use avatar component
+  const name = form.watch("name");
 
   return (
     <Form {...form}>
@@ -102,22 +102,14 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
           )}
         />
 
-        {imageUrl && (
-          <div className="mt-4">
-            <p className="text-sm text-muted-foreground mb-2">Preview:</p>
-            <div className="w-16 h-16 rounded-full overflow-hidden border border-border">
-              <img
-                src={imageUrl}
-                alt="Profile preview"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "https://via.placeholder.com/150";
-                }}
-              />
-            </div>
-          </div>
-        )}
+        {/* Image Preview */}
+        <div className="mt-4">
+          <p className="text-sm text-muted-foreground mb-2">Preview:</p>
+          <Avatar className="h-16 w-16 border border-border">
+            <AvatarImage src={imageUrl || undefined} alt="Profile preview" />
+            <AvatarFallback>{getInitials(name || "", "U")}</AvatarFallback>
+          </Avatar>
+        </div>
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Updating..." : "Update Profile"}

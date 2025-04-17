@@ -1,15 +1,14 @@
-/* eslint-disable @next/next/no-img-element */
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { ProfileForm } from "@/components/profile-form";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getInitials } from "@/lib/utils";
 
 export default async function ProfilePage() {
   const session = await auth();
   if (!session?.user?.id) {
     return redirect("/signin");
   }
-
-  // todo use avatar component instead of img
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -24,13 +23,15 @@ export default async function ProfilePage() {
         </div>
 
         <div className="flex items-center space-x-6 mb-8">
-          <div className="h-20 w-20 rounded-full overflow-hidden border border-border shadow-md">
-            <img
-              src={session.user.image || "https://via.placeholder.com/150"}
+          <Avatar className="h-20 w-20 border border-border shadow-md">
+            <AvatarImage
+              src={session.user.image || undefined}
               alt={session.user.name || "Profile picture"}
-              className="h-full w-full object-cover"
             />
-          </div>
+            <AvatarFallback className="text-xl font-semibold">
+              {getInitials(session.user.name)}
+            </AvatarFallback>
+          </Avatar>
           <div>
             <h2 className="text-xl font-semibold text-foreground">
               {session.user.name}

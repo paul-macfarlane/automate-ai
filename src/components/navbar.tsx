@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { SignOutButton } from "@/components/signout-button";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface NavbarProps {
   user: {
@@ -25,8 +26,6 @@ export function Navbar({ user }: NavbarProps) {
     { href: "/dashboard", label: "Dashboard" },
     { href: "/roadmap", label: "Roadmap" },
   ];
-
-  // todo use avatar component instead of img
 
   return (
     <nav className="w-full border-b border-border bg-background/70 backdrop-blur-md fixed top-0 z-10">
@@ -63,19 +62,13 @@ export function Navbar({ user }: NavbarProps) {
             <>
               <Button variant="outline" asChild>
                 <Link href="/profile" className="flex items-center gap-2">
-                  {user.image && (
-                    <div className="h-6 w-6 rounded-full overflow-hidden">
-                      <img
-                        src={user.image}
-                        alt="Profile"
-                        className="h-full w-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            "https://via.placeholder.com/150";
-                        }}
-                      />
-                    </div>
-                  )}
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage
+                      src={user.image || undefined}
+                      alt={user.name || "User"}
+                    />
+                    <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                  </Avatar>
                   <span className="hidden sm:block">Profile</span>
                 </Link>
               </Button>
