@@ -1,18 +1,16 @@
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Navbar } from "@/components/navbar";
 
 export default async function Home() {
   const session = await auth();
 
   return (
-    <main className="flex min-h-screen flex-col bg-background">
-      <Navbar user={session?.user || null} />
-
+    <>
       {!session?.user ? (
         <div className="flex flex-1 flex-col">
-          <section className="container mx-auto grid gap-8 py-16 md:grid-cols-2 md:py-24 px-4">
+          {/* Hero Section */}
+          <section className="container mx-auto grid gap-8 py-16 md:grid-cols-2 md:py-24">
             <div className="flex flex-col justify-center space-y-6">
               <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-foreground">
                 Automate Your{" "}
@@ -133,57 +131,14 @@ export default async function Home() {
             </div>
           </section>
 
-          {/* TODO: Add testimonials at a later date when there are real users */}
-          {/* <section className="py-16">
-            <div className="container mx-auto px-4">
-              <h2 className="mb-12 text-center text-3xl font-bold">
-                What Our Users Say
-              </h2>
-              <div className="grid gap-8 md:grid-cols-2">
-                <div className="rounded-lg bg-card p-6 shadow-md">
-                  <p className="mb-4 italic text-muted-foreground">
-                    &ldquo;Automanager completely transformed how we manage
-                    projects. The AI roadmap generator saved us countless hours
-                    of planning.&rdquo;
-                  </p>
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-muted"></div>
-                    <div>
-                      <h4 className="font-semibold text-card-foreground">Sarah Johnson</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Project Manager, TechCorp
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="rounded-lg bg-card p-6 shadow-md">
-                  <p className="mb-4 italic text-muted-foreground">
-                    &ldquo;The analytics dashboard gives us real-time insights
-                    into our project progress. It&rsquo;s been invaluable for
-                    keeping our stakeholders informed.&rdquo;
-                  </p>
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-muted"></div>
-                    <div>
-                      <h4 className="font-semibold text-card-foreground">Michael Chen</h4>
-                      <p className="text-sm text-muted-foreground">
-                        CTO, StartupX
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section> */}
-
           <section className="bg-primary py-16">
             <div className="container mx-auto px-4 text-center">
               <h2 className="mb-6 text-3xl font-bold text-primary-foreground">
                 Ready to Streamline Your Project Management?
               </h2>
               <p className="mb-8 text-xl text-primary-foreground">
-                Join thousands of teams already using Automanager to supercharge
-                their productivity.
+                Join the teams already using Automanager to supercharge their
+                productivity.
               </p>
               <Button
                 size="lg"
@@ -253,6 +208,6 @@ export default async function Home() {
           </div>
         </div>
       )}
-    </main>
+    </>
   );
 }
