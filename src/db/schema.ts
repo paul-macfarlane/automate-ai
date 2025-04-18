@@ -4,6 +4,7 @@ import {
   text,
   primaryKey,
 } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
 import type { AdapterAccount as AdapterAccountType } from "next-auth/adapters";
 
 export const users = sqliteTable("user", {
@@ -33,11 +34,11 @@ export const accounts = sqliteTable(
     id_token: text("id_token"),
     session_state: text("session_state"),
   },
-  (account) => ({
-    compoundKey: primaryKey({
+  (account) => [
+    primaryKey({
       columns: [account.provider, account.providerAccountId],
     }),
-  })
+  ]
 );
 
 export const sessions = sqliteTable("session", {
@@ -55,11 +56,11 @@ export const verificationTokens = sqliteTable(
     token: text("token").notNull(),
     expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
   },
-  (verificationToken) => ({
-    compositePk: primaryKey({
+  (verificationToken) => [
+    primaryKey({
       columns: [verificationToken.identifier, verificationToken.token],
     }),
-  })
+  ]
 );
 
 export const authenticators = sqliteTable(
@@ -78,9 +79,50 @@ export const authenticators = sqliteTable(
     }).notNull(),
     transports: text("transports"),
   },
-  (authenticator) => ({
-    compositePK: primaryKey({
+  (authenticator) => [
+    primaryKey({
       columns: [authenticator.userId, authenticator.credentialID],
     }),
-  })
+  ]
 );
+
+export const projects = sqliteTable("projects", {
+  id: text("id")
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => crypto.randomUUID()),
+  title: text("title").notNull(),
+  description: text("description"),
+  icon: text("icon"),
+  createdById: text("created_by_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`)
+    .$onUpdateFn(() => sql`CURRENT_TIMESTAMP`),
+});
+
+export const projectMembers = sqliteTable("project_members", {
+  id: text("id")
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  role: text("role", { enum: ["admin", "editor", "viewer"] }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`)
+    .$onUpdateFn(() => sql`CURRENT_TIMESTAMP`),
+});

@@ -197,7 +197,7 @@ function Dashboard() {
           </h2>
           <p className="mb-4 text-muted-foreground">Create a new project</p>
           <Button asChild className="w-full">
-            <Link href="/roadmap">Create Roadmap</Link>
+            <Link href="/projects/new">Create Project</Link>
           </Button>
         </div>
         <div className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow bg-card">

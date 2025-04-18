@@ -1,35 +1,35 @@
 "use server";
 
 import {
-  updateProfileSchema,
-  type UpdateProfileValues,
-} from "@/lib/models/profile";
+  createProjectSchema,
+  type CreateProjectValues,
+} from "@/lib/models/projects";
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { projects, projectMembers } from "@/db/schema";
 
-export type ProfileActionResult = {
+export type CreateProjectActionResult = {
   success: boolean;
   message: string;
+  projectId?: string;
   fieldErrors?: {
     [key: string]: string[];
   };
 };
 
-export async function updateProfile(
-  values: UpdateProfileValues
-): Promise<ProfileActionResult> {
+export async function createProject(
+  values: CreateProjectValues
+): Promise<CreateProjectActionResult> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return {
         success: false,
-        message: "You must be logged in to perform this action.",
+        message: "You must be logged in to create a project.",
       };
     }
 
-    const validationResult = updateProfileSchema.safeParse(values);
+    const validationResult = createProjectSchema.safeParse(values);
     if (!validationResult.success) {
       const fieldErrors: { [key: string]: string[] } = {};
       validationResult.error.errors.forEach((error) => {
@@ -47,20 +47,29 @@ export async function updateProfile(
       };
     }
 
-    await db
-      .update(users)
-      .set({
-        name: validationResult.data.name,
-        image: validationResult.data.image || null,
+    const queryResult = await db
+      .insert(projects)
+      .values({
+        title: validationResult.data.title,
+        description: validationResult.data.description || null,
+        icon: validationResult.data.icon || null,
+        createdById: session.user.id,
       })
-      .where(eq(users.id, session.user.id));
+      .returning();
+
+    await db.insert(projectMembers).values({
+      userId: session.user.id,
+      role: "admin",
+      projectId: queryResult[0].id,
+    });
 
     return {
       success: true,
-      message: "Profile updated successfully.",
+      message: "Project created successfully.",
+      projectId: queryResult[0].id,
     };
   } catch (error) {
-    console.error("Error updating profile:", error);
+    console.error("Error creating project:", error);
 
     if (error instanceof Error) {
       return {
