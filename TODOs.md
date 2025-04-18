@@ -1,6 +1,6 @@
 # List of TODOs
 
-- [] generate README for development process, link out to other markdown files
+- [x] generate README for development process, link out to other markdown files
 - [] create database abstraction layer
 - [] add timezone to user profile, default to est
 - [] use user timezone for dates displayed
