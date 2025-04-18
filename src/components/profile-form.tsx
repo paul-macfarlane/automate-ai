@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   profileSchema,
   type ProfileFormValues,
 } from "@/lib/validations/profile";
-import { updateProfile } from "@/actions/profile";
+import { updateProfile, type ProfileActionResult } from "@/actions/profile";
 import { toast } from "sonner";
 import { getInitials } from "@/lib/utils";
+import { useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,15 +23,24 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useActionState } from "react";
 
 interface ProfileFormProps {
   initialFormValues: ProfileFormValues;
 }
 
-export function ProfileForm({ initialFormValues }: ProfileFormProps) {
-  // todo this might be able to be updated to use action state
-  const [isLoading, setIsLoading] = useState(false);
+// Separate submit button component to leverage useFormStatus
+function SubmitButton() {
+  const { pending } = useFormStatus();
 
+  return (
+    <Button type="submit" className="w-full" disabled={pending}>
+      {pending ? "Updating..." : "Update Profile"}
+    </Button>
+  );
+}
+
+export function ProfileForm({ initialFormValues }: ProfileFormProps) {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -40,31 +49,50 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
     },
   });
 
-  async function onSubmit(values: ProfileFormValues) {
-    setIsLoading(true);
+  const [, action] = useActionState<ProfileActionResult, FormData>(
+    async (_prevState, formData) => {
+      try {
+        const values = {
+          name: formData.get("name") as string,
+          image: formData.get("image") as string,
+        };
 
-    try {
-      const result = await updateProfile(values);
+        const result = await updateProfile(values);
 
-      if (result.success) {
-        toast.success(result.message);
-      } else {
-        toast.error(result.message);
+        if (result.success) {
+          toast.success(result.message);
+        } else {
+          toast.error(result.message);
+
+          if (result.fieldErrors) {
+            Object.entries(result.fieldErrors).forEach(([field, errors]) => {
+              form.setError(field as keyof ProfileFormValues, {
+                type: "server",
+                message: errors.join(", "),
+              });
+            });
+          }
+        }
+
+        return result;
+      } catch (err) {
+        console.error("Profile update error:", err);
+        toast.error("Something went wrong. Please try again.");
+        return {
+          success: false,
+          message: "An unexpected error occurred.",
+        };
       }
-    } catch {
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  }
+    },
+    { success: false, message: "" }
+  );
 
-  // Watch the image field to display preview
   const imageUrl = form.watch("image");
   const name = form.watch("name");
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form action={action} className="space-y-6">
         <FormField
           control={form.control}
           name="name"
@@ -72,7 +100,7 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
             <FormItem>
               <FormLabel>Display Name</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Your name" />
+                <Input {...field} placeholder="Your name" name="name" />
               </FormControl>
               <FormDescription>
                 This is your public display name.
@@ -92,6 +120,7 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
                 <Input
                   {...field}
                   placeholder="https://example.com/your-image.jpg"
+                  name="image"
                 />
               </FormControl>
               <FormDescription>
@@ -102,7 +131,6 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
           )}
         />
 
-        {/* Image Preview */}
         <div className="mt-4">
           <p className="text-sm text-muted-foreground mb-2">Preview:</p>
           <Avatar className="h-16 w-16 border border-border">
@@ -111,9 +139,7 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
           </Avatar>
         </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Updating..." : "Update Profile"}
-        </Button>
+        <SubmitButton />
       </form>
     </Form>
   );

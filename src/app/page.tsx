@@ -172,42 +172,46 @@ export default async function Home() {
           </footer>
         </div>
       ) : (
-        <div className="container mx-auto px-4 py-12">
-          <div className="mb-12 text-center">
-            <h1 className="text-4xl font-bold mb-4 text-foreground">
-              Welcome to Your Dashboard
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Manage your projects with our suite of automated tools
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 w-full">
-            <div className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow bg-card">
-              <h2 className="text-2xl font-semibold mb-2 text-card-foreground">
-                Roadmap Generator
-              </h2>
-              <p className="mb-4 text-muted-foreground">
-                Create automated project roadmaps based on your requirements
-              </p>
-              <Button asChild className="w-full">
-                <Link href="/roadmap">Create Roadmap</Link>
-              </Button>
-            </div>
-            <div className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow bg-card">
-              <h2 className="text-2xl font-semibold mb-2 text-card-foreground">
-                Project Dashboard
-              </h2>
-              <p className="mb-4 text-muted-foreground">
-                Visualize your projects and track progress
-              </p>
-              <Button asChild className="w-full">
-                <Link href="/dashboard">View Dashboard</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+        <Dashboard />
       )}
     </>
+  );
+}
+
+function Dashboard() {
+  return (
+    <div className="container mx-auto px-4 py-12">
+      <div className="mb-12 text-center">
+        <h1 className="text-4xl font-bold mb-4 text-foreground">
+          Welcome to Your Dashboard
+        </h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          Manage your projects with our suite of automated tools
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 w-full">
+        <div className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow bg-card">
+          <h2 className="text-2xl font-semibold mb-2 text-card-foreground">
+            Create Project
+          </h2>
+          <p className="mb-4 text-muted-foreground">Create a new project</p>
+          <Button asChild className="w-full">
+            <Link href="/roadmap">Create Roadmap</Link>
+          </Button>
+        </div>
+        <div className="border border-border rounded-lg p-6 hover:shadow-md transition-shadow bg-card">
+          <h2 className="text-2xl font-semibold mb-2 text-card-foreground">
+            Projects
+          </h2>
+          <p className="mb-4 text-muted-foreground">
+            View your projects and track progress
+          </p>
+          <Button asChild className="w-full">
+            <Link href="/projects">View Projects</Link>
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }

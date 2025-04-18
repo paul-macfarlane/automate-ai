@@ -9,7 +9,17 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-export async function updateProfile(values: ProfileFormValues) {
+export type ProfileActionResult = {
+  success: boolean;
+  message: string;
+  fieldErrors?: {
+    [key: string]: string[];
+  };
+};
+
+export async function updateProfile(
+  values: ProfileFormValues
+): Promise<ProfileActionResult> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -19,14 +29,29 @@ export async function updateProfile(values: ProfileFormValues) {
       };
     }
 
-    // todo add better validation that returns more detailed errors to client
-    const validatedValues = profileSchema.parse(values);
+    const validationResult = profileSchema.safeParse(values);
+    if (!validationResult.success) {
+      const fieldErrors: { [key: string]: string[] } = {};
+      validationResult.error.errors.forEach((error) => {
+        const field = error.path[0] as string;
+        if (!fieldErrors[field]) {
+          fieldErrors[field] = [];
+        }
+        fieldErrors[field].push(error.message);
+      });
+
+      return {
+        success: false,
+        message: "Please fix the errors in the form.",
+        fieldErrors,
+      };
+    }
 
     await db
       .update(users)
       .set({
-        name: validatedValues.name,
-        image: validatedValues.image || null,
+        name: validationResult.data.name,
+        image: validationResult.data.image || null,
       })
       .where(eq(users.id, session.user.id));
 

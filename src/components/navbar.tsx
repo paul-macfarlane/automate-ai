@@ -22,8 +22,7 @@ export function Navbar({ user }: NavbarProps) {
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/dashboard", label: "Dashboard" },
-    { href: "/roadmap", label: "Roadmap" },
+    { href: "/projects", label: "Projects" },
   ];
 
   return (
