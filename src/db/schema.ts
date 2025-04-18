@@ -4,7 +4,7 @@ import {
   text,
   primaryKey,
 } from "drizzle-orm/sqlite-core";
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import type { AdapterAccount as AdapterAccountType } from "next-auth/adapters";
 
 export const users = sqliteTable("user", {
@@ -99,12 +99,16 @@ export const projects = sqliteTable("projects", {
     .references(() => users.id, { onDelete: "cascade" }),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`),
+    .default(sql`(unixepoch())`),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`)
-    .$onUpdateFn(() => sql`CURRENT_TIMESTAMP`),
+    .default(sql`(unixepoch())`)
+    .$onUpdate(() => new Date()),
 });
+
+export const projectRelations = relations(projects, ({ many }) => ({
+  members: many(projectMembers),
+}));
 
 export const projectMembers = sqliteTable("project_members", {
   id: text("id")
@@ -123,6 +127,13 @@ export const projectMembers = sqliteTable("project_members", {
     .default(sql`CURRENT_TIMESTAMP`),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`)
-    .$onUpdateFn(() => sql`CURRENT_TIMESTAMP`),
+    .default(sql`(unixepoch())`)
+    .$onUpdate(() => new Date()),
 });
+
+export const projectMembersRelations = relations(projectMembers, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectMembers.projectId],
+    references: [projects.id],
+  }),
+}));

@@ -15,6 +15,13 @@
       "when": 1744939752062,
       "tag": "0001_marvelous_toad_men",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1744944631580,
+      "tag": "0002_cooing_harpoon",
+      "breakpoints": true
     }
   ]
 }

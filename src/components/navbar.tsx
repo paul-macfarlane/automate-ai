@@ -41,7 +41,8 @@ export function Navbar({ user }: NavbarProps) {
                   href={link.href}
                   className={cn(
                     "text-sm transition-colors hover:text-foreground",
-                    pathname === link.href
+                    pathname === link.href ||
+                      (link.href !== "/" && pathname.startsWith(link.href))
                       ? "text-foreground font-medium"
                       : "text-muted-foreground"
                   )}
