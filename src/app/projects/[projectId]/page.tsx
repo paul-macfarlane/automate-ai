@@ -10,7 +10,7 @@ import { getInitials } from "@/lib/utils";
 export default async function ProjectPage({
   params,
 }: {
-  params: { projectId: string };
+  params: Promise<{ projectId: string }>;
 }) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -19,8 +19,10 @@ export default async function ProjectPage({
 
   const userId = session.user.id;
 
+  const { projectId } = await params;
+
   const project = await db.query.projects.findFirst({
-    where: eq(projects.id, params.projectId),
+    where: eq(projects.id, projectId),
   });
   if (!project) {
     return notFound();
