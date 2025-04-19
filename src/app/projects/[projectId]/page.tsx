@@ -1,21 +1,20 @@
-import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { getInitials } from "@/utils";
 import { selectProjectWithMembers } from "@/db/projects";
-
+import { formatDateShort } from "@/dates";
+import { TimezoneValue } from "@/timezones";
+import { getAuthedUser } from "@/services/users";
 export default async function ProjectPage({
   params,
 }: {
   params: Promise<{ projectId: string }>;
 }) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthedUser();
+  if (!user) {
     redirect("/signin");
   }
-
-  const userId = session.user.id;
 
   const { projectId } = await params;
 
@@ -24,7 +23,7 @@ export default async function ProjectPage({
     return notFound();
   }
 
-  const userMember = project.members.find((m) => m.user.id === userId);
+  const userMember = project.members.find((m) => m.user.id === user.id);
   if (!userMember) {
     return redirect("/projects");
   }
@@ -63,11 +62,16 @@ export default async function ProjectPage({
               </p>
             )}
             <div className="text-sm text-muted-foreground">
-              Created {new Date(project.createdAt).toLocaleDateString()}
+              Created{" "}
+              {formatDateShort(
+                project.createdAt,
+                user.timezone as TimezoneValue
+              )}
               {project.updatedAt !== project.createdAt &&
-                ` · Updated ${new Date(
-                  project.updatedAt
-                ).toLocaleDateString()}`}
+                ` · Updated ${formatDateShort(
+                  project.updatedAt,
+                  user.timezone as TimezoneValue
+                )}`}
             </div>
           </div>
         </div>

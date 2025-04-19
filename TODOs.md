@@ -3,7 +3,7 @@
 - [x] generate README for development process, link out to other markdown files
 - [x] create database abstraction layer
 - [x] add timezone to user profile, default to est
-- [] use user timezone for dates displayed
+- [x] use user timezone for dates displayed
 - [] make user set their profile after sign up (if possible)
 - [] add members management page or modal
 - [] add edit project info page, include in here ability to delete

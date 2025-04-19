@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getInitials } from "@/utils";
@@ -6,14 +5,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { selectUserProjects } from "@/db/projects";
+import { formatDateShort } from "@/dates";
+import { TimezoneValue } from "@/timezones";
+import { getAuthedUser } from "@/services/users";
 
 export default async function ProjectsPage() {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthedUser();
+  if (!user) {
     redirect("/signin");
   }
 
-  const userProjects = await selectUserProjects(session.user.id);
+  const userProjects = await selectUserProjects(user.id);
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -82,7 +84,10 @@ export default async function ProjectsPage() {
                   {role === "viewer" && <Badge variant="outline">Viewer</Badge>}
                 </div>
                 <span className="text-muted-foreground">
-                  {project.updatedAt.toLocaleDateString()}
+                  {formatDateShort(
+                    project.updatedAt,
+                    user.timezone as TimezoneValue
+                  )}
                 </span>
               </div>
             </Link>

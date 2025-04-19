@@ -1,19 +1,13 @@
-import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { ProfileForm } from "@/components/profile-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/utils";
-import { selectUser } from "@/db/users";
 import { TimezoneValue } from "@/timezones";
-export default async function ProfilePage() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return redirect("/signin");
-  }
+import { getAuthedUser } from "@/services/users";
 
-  const user = await selectUser(session.user.id);
+export default async function ProfilePage() {
+  const user = await getAuthedUser();
   if (!user) {
-    console.error("User not found in database for id: ", session.user.id);
     return redirect("/signin");
   }
 
@@ -32,18 +26,18 @@ export default async function ProfilePage() {
         <div className="flex items-center space-x-6 mb-8">
           <Avatar className="h-20 w-20 border border-border shadow-md">
             <AvatarImage
-              src={session.user.image || undefined}
-              alt={session.user.name || "Profile picture"}
+              src={user.image || undefined}
+              alt={user.name || "Profile picture"}
             />
             <AvatarFallback className="text-xl font-semibold">
-              {getInitials(session.user.name)}
+              {getInitials(user.name)}
             </AvatarFallback>
           </Avatar>
           <div>
             <h2 className="text-xl font-semibold text-foreground">
-              {session.user.name}
+              {user.name}
             </h2>
-            <p className="text-muted-foreground">{session.user.email}</p>
+            <p className="text-muted-foreground">{user.email}</p>
           </div>
         </div>
 
@@ -54,8 +48,8 @@ export default async function ProfilePage() {
             </h3>
             <ProfileForm
               initialFormValues={{
-                name: session.user.name || "",
-                image: session.user.image || "",
+                name: user.name || "",
+                image: user.image || "",
                 timezone: user.timezone as TimezoneValue,
               }}
             />
