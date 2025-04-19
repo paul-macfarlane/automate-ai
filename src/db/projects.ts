@@ -97,3 +97,64 @@ export const insertProjectMember = withTransaction(
     return queryResult[0];
   }
 );
+
+export type UpdateProjectValues = {
+  title?: string;
+  description?: string;
+  icon?: string;
+};
+
+export type UpdateProjectParams = {
+  projectId: string;
+  values: UpdateProjectValues;
+};
+
+export const updateProject = withTransaction(
+  async (
+    tx: TransactionContext,
+    params: UpdateProjectParams
+  ): Promise<Project> => {
+    const { projectId, values } = params;
+    const queryResult = await tx
+      .update(projects)
+      .set({
+        title: values.title,
+        description: values.description === "" ? null : values.description,
+        icon: values.icon === "" ? null : values.icon,
+      })
+      .where(eq(projects.id, projectId))
+      .returning();
+
+    return queryResult[0];
+  }
+);
+
+export type SelectProjectWithMemberParams = {
+  projectId: string;
+  userId: string;
+};
+
+export type ProjectWithMember = Project & {
+  member: ProjectMember;
+};
+
+export const selectProjectWithMember = withDb(
+  async (
+    dbContext: DbContext,
+    { projectId, userId }: SelectProjectWithMemberParams
+  ): Promise<ProjectWithMember | undefined> => {
+    const project = await dbContext.query.projects.findFirst({
+      where: eq(projects.id, projectId),
+      with: {
+        members: {
+          where: eq(projectMembers.userId, userId),
+        },
+      },
+    });
+    if (!project) {
+      return undefined;
+    }
+
+    return { ...project, member: project.members[0] };
+  }
+);

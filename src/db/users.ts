@@ -19,7 +19,7 @@ export const updateUser = withTransaction(
       .update(users)
       .set({
         name: params.name,
-        image: params.image,
+        image: params.image === "" ? null : params.image,
         timezone: params.timezone,
       })
       .where(eq(users.id, params.userId))

@@ -1,7 +1,14 @@
 import { z } from "zod";
 
-export const projectRoleEnum = z.enum(["admin", "editor", "viewer"]);
-export type ProjectRole = z.infer<typeof projectRoleEnum>;
+export enum ProjectRole {
+  Admin = "admin",
+  Editor = "editor",
+  Viewer = "viewer",
+}
+
+export const PROJECT_ROLES = Object.values(ProjectRole);
+export const EDITABLE_PROJECT_ROLES = [ProjectRole.Admin, ProjectRole.Editor];
+export const ADMIN_PROJECT_ROLES = [ProjectRole.Admin];
 
 export const createProjectSchema = z.object({
   title: z

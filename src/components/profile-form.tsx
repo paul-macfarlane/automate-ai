@@ -68,6 +68,7 @@ export function ProfileForm({ initialFormValues, newUser }: ProfileFormProps) {
 
             router.push("/");
           } else {
+            form.clearErrors();
             toast.success(result.message);
           }
         } else {

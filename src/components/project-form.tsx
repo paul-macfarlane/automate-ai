@@ -8,7 +8,8 @@ import {
 } from "@/models/projects";
 import {
   createProjectAction,
-  type CreateProjectActionResult,
+  updateProjectAction,
+  type MutateProjectActionResult,
 } from "@/actions/projects";
 import { toast } from "sonner";
 import { getInitials } from "@/utils";
@@ -29,29 +30,45 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useActionState } from "react";
+import { Project } from "@/db/projects";
 
-function SubmitButton() {
+type SubmitButtonProps = {
+  isEditing: boolean;
+};
+
+function SubmitButton({ isEditing }: SubmitButtonProps) {
   const { pending } = useFormStatus();
 
   return (
     <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? "Creating Project..." : "Create Project"}
+      {pending
+        ? isEditing
+          ? "Updating Project..."
+          : "Creating Project..."
+        : isEditing
+        ? "Update Project"
+        : "Create Project"}
     </Button>
   );
 }
 
-export function ProjectForm() {
+type ProjectFormProps = {
+  project?: Project;
+};
+
+export function ProjectForm({ project }: ProjectFormProps) {
+  const isEditing = !!project;
   const router = useRouter();
   const form = useForm<CreateProjectValues>({
     resolver: zodResolver(createProjectSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      icon: "",
+      title: project?.title || "",
+      description: project?.description || "",
+      icon: project?.icon || "",
     },
   });
 
-  const [, action] = useActionState<CreateProjectActionResult, FormData>(
+  const [, action] = useActionState<MutateProjectActionResult, FormData>(
     async (_prevState, formData) => {
       try {
         const values = {
@@ -60,11 +77,19 @@ export function ProjectForm() {
           icon: formData.get("icon") as string,
         };
 
-        const result = await createProjectAction(values);
+        let result: MutateProjectActionResult;
+        if (isEditing) {
+          result = await updateProjectAction(project.id, values);
+        } else {
+          result = await createProjectAction(values);
+        }
 
         if (result.success) {
           toast.success(result.message);
-          router.push(`/projects/${result.projectId!}`);
+          if (!isEditing) {
+            router.push(`/projects/${result.projectId!}`);
+          }
+          form.clearErrors();
         } else {
           toast.error(result.message);
 
@@ -80,7 +105,7 @@ export function ProjectForm() {
 
         return result;
       } catch (err) {
-        console.error("Project creation error:", err);
+        console.error("Project operation error:", err);
         toast.error("Something went wrong. Please try again.");
         return {
           success: false,
@@ -166,7 +191,7 @@ export function ProjectForm() {
           </Avatar>
         </div>
 
-        <SubmitButton />
+        <SubmitButton isEditing={isEditing} />
       </form>
     </Form>
   );
