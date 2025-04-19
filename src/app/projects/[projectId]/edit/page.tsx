@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { ProjectForm } from "@/components/project-form";
 import { selectProjectWithMember } from "@/db/projects";
 import { auth } from "@/auth";
-import { isProjectEditable } from "@/services/projects";
+import { isProjectDeletable, isProjectEditable } from "@/services/projects";
+import DeleteProjectButton from "@/components/delete-project-button";
 
 export default async function EditProjectPage({
   params,
@@ -24,9 +25,11 @@ export default async function EditProjectPage({
     return redirect("/projects");
   }
 
-  if (isProjectEditable(projectWithMember)) {
+  if (!isProjectEditable(projectWithMember)) {
     return redirect(`/projects/${projectId}`);
   }
+
+  const canDeleteProject = isProjectDeletable(projectWithMember);
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -44,6 +47,20 @@ export default async function EditProjectPage({
           <div className="rounded-lg border border-border p-6 bg-card">
             <ProjectForm project={projectWithMember} />
           </div>
+
+          {canDeleteProject && (
+            <div className="rounded-lg border border-border p-6 bg-card">
+              <h2 className="text-xl font-semibold mb-4">Danger Zone</h2>
+              <p className="text-muted-foreground mb-4">
+                Once you delete a project, there is no going back. Please be
+                sure.
+              </p>
+              <DeleteProjectButton
+                projectId={projectId}
+                projectTitle={projectWithMember.title}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

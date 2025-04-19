@@ -158,3 +158,9 @@ export const selectProjectWithMember = withDb(
     return { ...project, member: project.members[0] };
   }
 );
+
+export const deleteProject = withTransaction(
+  async (tx: TransactionContext, projectId: string): Promise<void> => {
+    await tx.delete(projects).where(eq(projects.id, projectId));
+  }
+);

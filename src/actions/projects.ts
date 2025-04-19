@@ -11,8 +11,9 @@ import {
   insertProjectMember,
   selectProjectWithMember,
   updateProject,
+  deleteProject,
 } from "@/db/projects";
-import { isProjectEditable } from "@/services/projects";
+import { isProjectDeletable, isProjectEditable } from "@/services/projects";
 
 export type MutateProjectActionResult = {
   success: boolean;
@@ -154,6 +155,57 @@ export async function updateProjectAction(
     };
   } catch (error) {
     console.error("Error updating project:", error);
+
+    let message = "An unexpected error occurred. Please try again later.";
+    if (error instanceof Error) {
+      message = error.message;
+    }
+
+    return {
+      success: false,
+      message,
+    };
+  }
+}
+
+export async function deleteProjectAction(
+  projectId: string
+): Promise<MutateProjectActionResult> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        message: "You must be logged in to delete a project.",
+      };
+    }
+
+    const projectWithMember = await selectProjectWithMember({
+      projectId,
+      userId: session.user.id,
+    });
+    if (!projectWithMember) {
+      return {
+        success: false,
+        message: "Project not found.",
+      };
+    }
+
+    if (!isProjectDeletable(projectWithMember)) {
+      return {
+        success: false,
+        message: "You do not have permission to delete this project.",
+      };
+    }
+
+    await deleteProject(projectId);
+
+    return {
+      success: true,
+      message: "Project deleted successfully.",
+    };
+  } catch (error) {
+    console.error("Error deleting project:", error);
 
     let message = "An unexpected error occurred. Please try again later.";
     if (error instanceof Error) {
