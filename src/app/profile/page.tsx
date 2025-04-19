@@ -5,11 +5,20 @@ import { getInitials } from "@/utils";
 import { TimezoneValue } from "@/timezones";
 import { getAuthedUser } from "@/services/users";
 
-export default async function ProfilePage() {
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    newUser: string;
+  }>;
+}) {
   const user = await getAuthedUser();
   if (!user) {
     return redirect("/signin");
   }
+
+  const { newUser: newUserParam } = await searchParams;
+  const newUser = newUserParam === "true";
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -19,7 +28,9 @@ export default async function ProfilePage() {
             Profile
           </h1>
           <p className="text-muted-foreground mt-2">
-            Manage your account settings and profile information.
+            {newUser
+              ? "Set up your profile"
+              : "Manage your account settings and profile information."}
           </p>
         </div>
 
@@ -52,6 +63,7 @@ export default async function ProfilePage() {
                 image: user.image || "",
                 timezone: user.timezone as TimezoneValue,
               }}
+              newUser={newUser}
             />
           </div>
         </div>

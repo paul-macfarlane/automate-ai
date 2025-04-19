@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TIMEZONES, TimezoneValue } from "@/timezones";
+import { useRouter } from "next/navigation";
 
 interface ProfileFormProps {
   initialFormValues: {
@@ -37,20 +38,10 @@ interface ProfileFormProps {
     image?: string;
     timezone?: TimezoneValue;
   };
+  newUser: boolean;
 }
 
-// Separate submit button component to leverage useFormStatus
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? "Updating..." : "Update Profile"}
-    </Button>
-  );
-}
-
-export function ProfileForm({ initialFormValues }: ProfileFormProps) {
+export function ProfileForm({ initialFormValues, newUser }: ProfileFormProps) {
   const form = useForm<UpdateUserValues>({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
@@ -59,6 +50,7 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
       timezone: initialFormValues.timezone || TimezoneValue.AMERICA_NEW_YORK,
     },
   });
+  const router = useRouter();
 
   const [, action] = useActionState<UpdateUserActionResult, FormData>(
     async (_prevState, formData) => {
@@ -71,7 +63,13 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
 
         const result = await updateUserAction(values);
         if (result.success) {
-          toast.success(result.message);
+          if (newUser) {
+            toast.success("Profile setup successfully!");
+
+            router.push("/");
+          } else {
+            toast.success(result.message);
+          }
         } else {
           toast.error(result.message);
 
@@ -208,8 +206,19 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
           </div>
         </div>
 
-        <SubmitButton />
+        <SubmitButton newUser={newUser} />
       </form>
     </Form>
+  );
+}
+
+// Separate submit button component to leverage useFormStatus
+function SubmitButton({ newUser }: { newUser: boolean }) {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button type="submit" className="w-full" disabled={pending}>
+      {pending ? "Updating..." : newUser ? "Create Profile" : "Update Profile"}
+    </Button>
   );
 }
