@@ -47,6 +47,7 @@ export async function updateUserAction(
       userId: session.user.id,
       name: validationResult.data.name,
       image: validationResult.data.image || null,
+      timezone: validationResult.data.timezone,
     });
 
     revalidatePath("/profile");

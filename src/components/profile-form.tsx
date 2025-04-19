@@ -7,6 +7,7 @@ import { updateUserAction, type UpdateUserActionResult } from "@/actions/users";
 import { toast } from "sonner";
 import { getInitials } from "@/utils";
 import { useFormStatus } from "react-dom";
+import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,9 +22,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useActionState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { TIMEZONES, TimezoneValue } from "@/timezones";
 
 interface ProfileFormProps {
-  initialFormValues: UpdateUserValues;
+  initialFormValues: {
+    name?: string;
+    image?: string;
+    timezone?: TimezoneValue;
+  };
 }
 
 // Separate submit button component to leverage useFormStatus
@@ -43,6 +56,7 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
     defaultValues: {
       name: initialFormValues.name || "",
       image: initialFormValues.image || "",
+      timezone: initialFormValues.timezone || TimezoneValue.AMERICA_NEW_YORK,
     },
   });
 
@@ -52,10 +66,10 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
         const values = {
           name: formData.get("name") as string,
           image: formData.get("image") as string,
+          timezone: formData.get("timezone") as TimezoneValue,
         };
 
         const result = await updateUserAction(values);
-
         if (result.success) {
           toast.success(result.message);
         } else {
@@ -87,6 +101,10 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
   const imageUrl = form.watch("image");
   const name = form.watch("name");
 
+  const clearImage = () => {
+    form.setValue("image", "", { shouldValidate: true });
+  };
+
   return (
     <Form {...form}>
       <form action={action} className="space-y-6">
@@ -113,15 +131,62 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Profile Picture URL</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder="https://example.com/your-image.jpg"
-                  name="image"
-                />
-              </FormControl>
+              <div className="flex space-x-2">
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="https://example.com/your-image.jpg"
+                    name="image"
+                  />
+                </FormControl>
+                {field.value && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={clearImage}
+                    title="Clear image URL"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
               <FormDescription>
-                Enter a URL for your profile picture.
+                Enter a URL for your profile picture. We recommend using
+                services like Gravatar or a direct image URL.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="timezone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Timezone</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                name="timezone"
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={"Select your timezone"} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {TIMEZONES.map((timezone) => (
+                    <SelectItem key={timezone} value={timezone}>
+                      {timezone}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                This will be used to display times and dates in your local
+                timezone.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -130,10 +195,17 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
 
         <div className="mt-4">
           <p className="text-sm text-muted-foreground mb-2">Preview:</p>
-          <Avatar className="h-16 w-16 border border-border">
-            <AvatarImage src={imageUrl || undefined} alt="Profile preview" />
-            <AvatarFallback>{getInitials(name || "", "U")}</AvatarFallback>
-          </Avatar>
+          <div className="flex flex-col items-center sm:flex-row sm:items-start sm:space-x-4">
+            <Avatar className="h-16 w-16 border border-border">
+              <AvatarImage src={imageUrl || undefined} alt="Profile preview" />
+              <AvatarFallback>{getInitials(name || "", "U")}</AvatarFallback>
+            </Avatar>
+            {!imageUrl && (
+              <p className="text-sm text-muted-foreground mt-2 sm:mt-0">
+                No image URL provided. Your profile will show initials instead.
+              </p>
+            )}
+          </div>
         </div>
 
         <SubmitButton />

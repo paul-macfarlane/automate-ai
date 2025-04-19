@@ -6,6 +6,7 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { relations, sql } from "drizzle-orm";
 import type { AdapterAccount as AdapterAccountType } from "next-auth/adapters";
+import { TIMEZONES, TimezoneValue } from "@/timezones";
 
 export const users = sqliteTable("user", {
   id: text("id")
@@ -15,10 +16,12 @@ export const users = sqliteTable("user", {
   email: text("email").unique(),
   emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
   image: text("image"),
+  timezone: text("timezone", { enum: TIMEZONES as [string, ...string[]] })
+    .default(TimezoneValue.AMERICA_NEW_YORK)
+    .notNull(),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
-  projects: many(projects),
   projectMembers: many(projectMembers),
 }));
 

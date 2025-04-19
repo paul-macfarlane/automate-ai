@@ -3,10 +3,17 @@ import { redirect } from "next/navigation";
 import { ProfileForm } from "@/components/profile-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/utils";
-
+import { selectUser } from "@/db/users";
+import { TimezoneValue } from "@/timezones";
 export default async function ProfilePage() {
   const session = await auth();
   if (!session?.user?.id) {
+    return redirect("/signin");
+  }
+
+  const user = await selectUser(session.user.id);
+  if (!user) {
+    console.error("User not found in database for id: ", session.user.id);
     return redirect("/signin");
   }
 
@@ -49,6 +56,7 @@ export default async function ProfilePage() {
               initialFormValues={{
                 name: session.user.name || "",
                 image: session.user.image || "",
+                timezone: user.timezone as TimezoneValue,
               }}
             />
           </div>
