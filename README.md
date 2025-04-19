@@ -78,12 +78,22 @@ automanager/
 │   └── lib/            # Utility functions and validations
 │       └── models/     # Data models and Zod validation schemas
 ├── docs/               # Documentation
-│   └── form-pattern.md # Form and server action patterns
+│   ├── form-pattern.md # Form and server action patterns
+│   └── database-patterns.md # Database abstraction patterns
 ├── public/             # Static assets
 └── README.md           # This file
 ```
 
 ## Development Guidelines
+
+### Database Patterns
+
+We use a standardized approach to database operations that balances performance and data integrity. See [Database Patterns Guide](docs/database-patterns.md) for details on:
+
+- Using transaction contexts for data operations
+- Working with the `withDb` and `withTransaction` utilities
+- Naming conventions and best practices
+- Type definitions and error handling
 
 ### Form Patterns
 
