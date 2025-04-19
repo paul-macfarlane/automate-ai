@@ -5,6 +5,17 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { deleteProjectAction } from "@/actions/projects";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export type DeleteProjectButtonProps = {
   projectId: string;
@@ -16,10 +27,9 @@ export default function DeleteProjectButton({
   projectTitle,
 }: DeleteProjectButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
-  // TODO: Use AlertDialog
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
@@ -30,51 +40,41 @@ export default function DeleteProjectButton({
         router.push("/projects");
       } else {
         toast.error(result.message);
-        setShowConfirmation(false);
+        setIsOpen(false);
       }
     } catch (error) {
       toast.error("Failed to delete project. Please try again.");
       console.error("Delete project error:", error);
-      setShowConfirmation(false);
+      setIsOpen(false);
     } finally {
       setIsDeleting(false);
     }
   };
 
-  if (showConfirmation) {
-    return (
-      <div className="border border-destructive p-4 rounded-md bg-destructive/5">
-        <p className="font-medium mb-4">
-          Are you sure you want to delete &quot;{projectTitle}&quot;?
-        </p>
-        <p className="text-sm text-muted-foreground mb-4">
-          This action cannot be undone. This will permanently delete the project
-          and all associated data.
-        </p>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowConfirmation(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
+  return (
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive">Delete Project</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This will permanently delete the project &quot;{projectTitle}&quot;
+            and all associated data. This action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
             onClick={handleDelete}
             disabled={isDeleting}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isDeleting ? "Deleting..." : "Yes, delete project"}
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <Button variant="destructive" onClick={() => setShowConfirmation(true)}>
-      Delete Project
-    </Button>
+            {isDeleting ? "Deleting..." : "Delete"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
