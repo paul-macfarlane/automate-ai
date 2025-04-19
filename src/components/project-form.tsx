@@ -5,13 +5,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createProjectSchema,
   type CreateProjectValues,
-} from "@/lib/models/projects";
+} from "@/models/projects";
 import {
-  createProject,
+  createProjectAction,
   type CreateProjectActionResult,
-} from "@/actions/project";
+} from "@/actions/projects";
 import { toast } from "sonner";
-import { getInitials } from "@/lib/utils";
+import { getInitials } from "@/utils";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 
@@ -60,7 +60,7 @@ export function ProjectForm() {
           icon: formData.get("icon") as string,
         };
 
-        const result = await createProject(values);
+        const result = await createProjectAction(values);
 
         if (result.success) {
           toast.success(result.message);

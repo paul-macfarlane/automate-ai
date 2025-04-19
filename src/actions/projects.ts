@@ -3,11 +3,10 @@
 import {
   createProjectSchema,
   type CreateProjectValues,
-} from "@/lib/models/projects";
+} from "@/models/projects";
 import { auth } from "@/auth";
-import { db } from "@/db";
-import { projects, projectMembers } from "@/db/schema";
-
+import { transaction } from "@/db/transaction";
+import { insertProject, insertProjectMember } from "@/db/projects";
 export type CreateProjectActionResult = {
   success: boolean;
   message: string;
@@ -17,7 +16,7 @@ export type CreateProjectActionResult = {
   };
 };
 
-export async function createProject(
+export async function createProjectAction(
   values: CreateProjectValues
 ): Promise<CreateProjectActionResult> {
   try {
@@ -47,40 +46,43 @@ export async function createProject(
       };
     }
 
-    const queryResult = await db
-      .insert(projects)
-      .values({
-        title: validationResult.data.title,
-        description: validationResult.data.description || null,
-        icon: validationResult.data.icon || null,
-        createdById: session.user.id,
-      })
-      .returning();
+    const project = await transaction(async (tx) => {
+      const project = await insertProject(
+        {
+          ...validationResult.data,
+          createdById: session.user!.id!,
+        },
+        tx
+      );
 
-    await db.insert(projectMembers).values({
-      userId: session.user.id,
-      role: "admin",
-      projectId: queryResult[0].id,
+      await insertProjectMember(
+        {
+          userId: session.user!.id!,
+          role: "admin",
+          projectId: project.id,
+        },
+        tx
+      );
+
+      return project;
     });
 
     return {
       success: true,
       message: "Project created successfully.",
-      projectId: queryResult[0].id,
+      projectId: project.id,
     };
   } catch (error) {
     console.error("Error creating project:", error);
 
+    let message = "An unexpected error occurred. Please try again later.";
     if (error instanceof Error) {
-      return {
-        success: false,
-        message: error.message,
-      };
+      message = error.message;
     }
 
     return {
       success: false,
-      message: "An unexpected error occurred. Please try again later.",
+      message,
     };
   }
 }

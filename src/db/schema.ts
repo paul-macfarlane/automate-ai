@@ -17,6 +17,11 @@ export const users = sqliteTable("user", {
   image: text("image"),
 });
 
+export const usersRelations = relations(users, ({ many }) => ({
+  projects: many(projects),
+  projectMembers: many(projectMembers),
+}));
+
 export const accounts = sqliteTable(
   "account",
   {
@@ -48,6 +53,13 @@ export const sessions = sqliteTable("session", {
     .references(() => users.id, { onDelete: "cascade" }),
   expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
 });
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
+  }),
+}));
 
 export const verificationTokens = sqliteTable(
   "verificationToken",
@@ -85,6 +97,13 @@ export const authenticators = sqliteTable(
     }),
   ]
 );
+
+export const authenticatorsRelations = relations(authenticators, ({ one }) => ({
+  user: one(users, {
+    fields: [authenticators.userId],
+    references: [users.id],
+  }),
+}));
 
 export const projects = sqliteTable("projects", {
   id: text("id")
@@ -135,5 +154,9 @@ export const projectMembersRelations = relations(projectMembers, ({ one }) => ({
   project: one(projects, {
     fields: [projectMembers.projectId],
     references: [projects.id],
+  }),
+  user: one(users, {
+    fields: [projectMembers.userId],
+    references: [users.id],
   }),
 }));

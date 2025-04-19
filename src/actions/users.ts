@@ -1,15 +1,11 @@
 "use server";
 
-import {
-  updateProfileSchema,
-  type UpdateProfileValues,
-} from "@/lib/models/profile";
+import { updateUserSchema, type UpdateUserValues } from "@/models/users";
 import { auth } from "@/auth";
-import { db } from "@/db";
-import { users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { updateUser } from "@/db/users";
+import { revalidatePath } from "next/cache";
 
-export type ProfileActionResult = {
+export type UpdateUserActionResult = {
   success: boolean;
   message: string;
   fieldErrors?: {
@@ -17,9 +13,9 @@ export type ProfileActionResult = {
   };
 };
 
-export async function updateProfile(
-  values: UpdateProfileValues
-): Promise<ProfileActionResult> {
+export async function updateUserAction(
+  values: UpdateUserValues
+): Promise<UpdateUserActionResult> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -29,7 +25,7 @@ export async function updateProfile(
       };
     }
 
-    const validationResult = updateProfileSchema.safeParse(values);
+    const validationResult = updateUserSchema.safeParse(values);
     if (!validationResult.success) {
       const fieldErrors: { [key: string]: string[] } = {};
       validationResult.error.errors.forEach((error) => {
@@ -47,13 +43,13 @@ export async function updateProfile(
       };
     }
 
-    await db
-      .update(users)
-      .set({
-        name: validationResult.data.name,
-        image: validationResult.data.image || null,
-      })
-      .where(eq(users.id, session.user.id));
+    await updateUser({
+      userId: session.user.id,
+      name: validationResult.data.name,
+      image: validationResult.data.image || null,
+    });
+
+    revalidatePath("/profile");
 
     return {
       success: true,
@@ -62,16 +58,14 @@ export async function updateProfile(
   } catch (error) {
     console.error("Error updating profile:", error);
 
+    let message = "An unexpected error occurred. Please try again later.";
     if (error instanceof Error) {
-      return {
-        success: false,
-        message: error.message,
-      };
+      message = error.message;
     }
 
     return {
       success: false,
-      message: "An unexpected error occurred. Please try again later.",
+      message,
     };
   }
 }

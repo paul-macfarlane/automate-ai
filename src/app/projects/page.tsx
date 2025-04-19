@@ -1,13 +1,11 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { db } from "@/db";
-import { projects, projectMembers } from "@/db/schema";
-import { eq, desc, count } from "drizzle-orm";
-import { getInitials } from "@/lib/utils";
+import { getInitials } from "@/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { selectUserProjects } from "@/db/projects";
 
 export default async function ProjectsPage() {
   const session = await auth();
@@ -15,17 +13,7 @@ export default async function ProjectsPage() {
     redirect("/signin");
   }
 
-  const userProjects = await db
-    .select({
-      project: projects,
-      role: projectMembers.role,
-      memberCount: count(projectMembers.id).as("memberCount"),
-    })
-    .from(projects)
-    .innerJoin(projectMembers, eq(projects.id, projectMembers.projectId))
-    .where(eq(projectMembers.userId, session.user.id))
-    .groupBy(projects.id, projectMembers.role)
-    .orderBy(desc(projects.updatedAt));
+  const userProjects = await selectUserProjects(session.user.id);
 
   return (
     <div className="container mx-auto py-10 px-4">

@@ -2,10 +2,8 @@ import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { db } from "@/db";
-import { projects, projectMembers, users } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { getInitials } from "@/lib/utils";
+import { getInitials } from "@/utils";
+import { selectProjectWithMembers } from "@/db/projects";
 
 export default async function ProjectPage({
   params,
@@ -21,25 +19,14 @@ export default async function ProjectPage({
 
   const { projectId } = await params;
 
-  const project = await db.query.projects.findFirst({
-    where: eq(projects.id, projectId),
-  });
+  const project = await selectProjectWithMembers(projectId);
   if (!project) {
     return notFound();
   }
 
-  const members = await db
-    .select({
-      member: projectMembers,
-      user: users,
-    })
-    .from(projectMembers)
-    .innerJoin(users, eq(projectMembers.userId, users.id))
-    .where(eq(projectMembers.projectId, project.id));
-
-  const userMember = members.find((m) => m.user.id === userId);
-  if (!userMember && project.createdById !== userId) {
-    redirect("/projects");
+  const userMember = project.members.find((m) => m.user.id === userId);
+  if (!userMember) {
+    return redirect("/projects");
   }
 
   const getRoleBadge = (role: string) => {
@@ -90,7 +77,7 @@ export default async function ProjectPage({
             Project Members
           </h2>
           <div className="space-y-4">
-            {members.map(({ member, user }) => (
+            {project.members.map((member) => (
               <div
                 key={member.id}
                 className="flex items-center justify-between"
@@ -98,17 +85,17 @@ export default async function ProjectPage({
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
                     <AvatarImage
-                      src={user.image || undefined}
-                      alt={user.name || "User"}
+                      src={member.user.image || undefined}
+                      alt={member.user.name || "User"}
                     />
                     <AvatarFallback>
-                      {getInitials(user.name || "", "U")}
+                      {getInitials(member.user.name || "", "U")}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="font-medium">{user.name}</div>
+                    <div className="font-medium">{member.user.name}</div>
                     <div className="text-sm text-muted-foreground">
-                      {user.email}
+                      {member.user.email}
                     </div>
                   </div>
                 </div>
@@ -118,7 +105,7 @@ export default async function ProjectPage({
           </div>
         </div>
 
-        {userMember?.member.role === "admin" && (
+        {userMember.role === "admin" && (
           <div className="border-t pt-6">
             <h2 className="text-xl font-semibold mb-4">Admin Actions</h2>
             <div className="flex flex-col gap-3 sm:flex-row">

@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { ProfileForm } from "@/components/profile-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getInitials } from "@/lib/utils";
+import { getInitials } from "@/utils";
 
 export default async function ProfilePage() {
   const session = await auth();

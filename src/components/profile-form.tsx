@@ -2,13 +2,10 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  updateProfileSchema,
-  type UpdateProfileValues,
-} from "@/lib/models/profile";
-import { updateProfile, type ProfileActionResult } from "@/actions/profile";
+import { updateUserSchema, type UpdateUserValues } from "@/models/users";
+import { updateUserAction, type UpdateUserActionResult } from "@/actions/users";
 import { toast } from "sonner";
-import { getInitials } from "@/lib/utils";
+import { getInitials } from "@/utils";
 import { useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui/button";
@@ -26,7 +23,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useActionState } from "react";
 
 interface ProfileFormProps {
-  initialFormValues: UpdateProfileValues;
+  initialFormValues: UpdateUserValues;
 }
 
 // Separate submit button component to leverage useFormStatus
@@ -41,15 +38,15 @@ function SubmitButton() {
 }
 
 export function ProfileForm({ initialFormValues }: ProfileFormProps) {
-  const form = useForm<UpdateProfileValues>({
-    resolver: zodResolver(updateProfileSchema),
+  const form = useForm<UpdateUserValues>({
+    resolver: zodResolver(updateUserSchema),
     defaultValues: {
       name: initialFormValues.name || "",
       image: initialFormValues.image || "",
     },
   });
 
-  const [, action] = useActionState<ProfileActionResult, FormData>(
+  const [, action] = useActionState<UpdateUserActionResult, FormData>(
     async (_prevState, formData) => {
       try {
         const values = {
@@ -57,7 +54,7 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
           image: formData.get("image") as string,
         };
 
-        const result = await updateProfile(values);
+        const result = await updateUserAction(values);
 
         if (result.success) {
           toast.success(result.message);
@@ -66,7 +63,7 @@ export function ProfileForm({ initialFormValues }: ProfileFormProps) {
 
           if (result.fieldErrors) {
             Object.entries(result.fieldErrors).forEach(([field, errors]) => {
-              form.setError(field as keyof UpdateProfileValues, {
+              form.setError(field as keyof UpdateUserValues, {
                 type: "server",
                 message: errors.join(", "),
               });
