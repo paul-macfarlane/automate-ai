@@ -29,14 +29,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TIMEZONES, TimezoneValue } from "@/timezones";
+import { TIMEZONES, Timezone } from "@/timezones";
 import { useRouter } from "next/navigation";
 
 interface ProfileFormProps {
   initialFormValues: {
     name?: string;
     image?: string;
-    timezone?: TimezoneValue;
+    timezone?: Timezone;
   };
   newUser: boolean;
 }
@@ -47,7 +47,7 @@ export function ProfileForm({ initialFormValues, newUser }: ProfileFormProps) {
     defaultValues: {
       name: initialFormValues.name || "",
       image: initialFormValues.image || "",
-      timezone: initialFormValues.timezone || TimezoneValue.AMERICA_NEW_YORK,
+      timezone: initialFormValues.timezone || Timezone.AMERICA_NEW_YORK,
     },
   });
   const router = useRouter();
@@ -58,7 +58,7 @@ export function ProfileForm({ initialFormValues, newUser }: ProfileFormProps) {
         const values = {
           name: formData.get("name") as string,
           image: formData.get("image") as string,
-          timezone: formData.get("timezone") as TimezoneValue,
+          timezone: formData.get("timezone") as Timezone,
         };
 
         const result = await updateUserAction(values);

@@ -1,4 +1,4 @@
-export enum TimezoneValue {
+export enum Timezone {
   AMERICA_NEW_YORK = "America/New_York",
   AMERICA_CHICAGO = "America/Chicago",
   AMERICA_DENVER = "America/Denver",
@@ -8,4 +8,4 @@ export enum TimezoneValue {
   PACIFIC_HONOLULU = "Pacific/Honolulu",
 }
 
-export const TIMEZONES = Object.values(TimezoneValue);
+export const TIMEZONES = Object.values(Timezone);

@@ -1,1 +1,0 @@
-ALTER TABLE `user` ADD `timezone` text DEFAULT 'America/New_York' NOT NULL;

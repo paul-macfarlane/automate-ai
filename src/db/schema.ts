@@ -6,7 +6,10 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { relations, sql } from "drizzle-orm";
 import type { AdapterAccount as AdapterAccountType } from "next-auth/adapters";
-import { TIMEZONES, TimezoneValue } from "@/timezones";
+import { TIMEZONES, Timezone } from "@/timezones";
+import { PROJECT_ROLES, ProjectRole } from "@/models/projects";
+import { PROJECT_INVITE_STATUSES } from "@/models/project-invites";
+import { ProjectInviteStatus } from "@/models/project-invites";
 
 export const users = sqliteTable("user", {
   id: text("id")
@@ -16,13 +19,21 @@ export const users = sqliteTable("user", {
   email: text("email").unique(),
   emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
   image: text("image"),
-  timezone: text("timezone", { enum: TIMEZONES as [string, ...string[]] })
-    .default(TimezoneValue.AMERICA_NEW_YORK)
+  timezone: text("timezone", {
+    enum: TIMEZONES as [Timezone, ...Timezone[]],
+  })
+    .default(Timezone.AMERICA_NEW_YORK)
     .notNull(),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
   projectMembers: many(projectMembers),
+  inviter: many(projectInvites, {
+    relationName: "inviter",
+  }),
+  invitee: many(projectInvites, {
+    relationName: "invitee",
+  }),
 }));
 
 export const accounts = sqliteTable(
@@ -130,6 +141,7 @@ export const projects = sqliteTable("projects", {
 
 export const projectRelations = relations(projects, ({ many }) => ({
   members: many(projectMembers),
+  invites: many(projectInvites),
 }));
 
 export const projectMembers = sqliteTable("project_members", {
@@ -143,10 +155,12 @@ export const projectMembers = sqliteTable("project_members", {
   userId: text("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  role: text("role", { enum: ["admin", "editor", "viewer"] }).notNull(),
+  role: text("role", {
+    enum: PROJECT_ROLES as [ProjectRole, ...ProjectRole[]],
+  }).notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`),
+    .default(sql`(unixepoch())`),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`)
@@ -161,5 +175,56 @@ export const projectMembersRelations = relations(projectMembers, ({ one }) => ({
   user: one(users, {
     fields: [projectMembers.userId],
     references: [users.id],
+  }),
+}));
+
+export const projectInvites = sqliteTable("project_invites", {
+  id: text("id")
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+  email: text("email").notNull(),
+  status: text("status", {
+    enum: PROJECT_INVITE_STATUSES as [
+      ProjectInviteStatus,
+      ...ProjectInviteStatus[]
+    ],
+  })
+    .notNull()
+    .default(ProjectInviteStatus.Pending),
+  role: text("role", {
+    enum: PROJECT_ROLES as [ProjectRole, ...ProjectRole[]],
+  }).notNull(),
+  inviterId: text("inviter_id")
+    .notNull()
+    .references(() => users.id),
+  inviteeId: text("invitee_id").references(() => users.id),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`)
+    .$onUpdate(() => new Date()),
+});
+
+export const projectInvitesRelations = relations(projectInvites, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectInvites.projectId],
+    references: [projects.id],
+  }),
+  inviter: one(users, {
+    fields: [projectInvites.inviterId],
+    references: [users.id],
+    relationName: "inviter",
+  }),
+  invitee: one(users, {
+    fields: [projectInvites.inviteeId],
+    references: [users.id],
+    relationName: "invitee",
   }),
 }));

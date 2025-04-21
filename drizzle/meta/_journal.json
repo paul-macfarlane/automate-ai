@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1744850164954,
-      "tag": "0000_wandering_beyonder",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1744939752062,
-      "tag": "0001_marvelous_toad_men",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1744944631580,
-      "tag": "0002_cooing_harpoon",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1745075133222,
-      "tag": "0003_giant_namorita",
+      "when": 1745164132497,
+      "tag": "0000_orange_jetstream",
       "breakpoints": true
     }
   ]

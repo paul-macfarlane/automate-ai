@@ -1,4 +1,4 @@
-import { TimezoneValue } from "@/timezones";
+import { Timezone } from "@/timezones";
 import { z } from "zod";
 
 export const updateUserSchema = z.object({
@@ -11,7 +11,7 @@ export const updateUserSchema = z.object({
     .url({ message: "Please enter a valid URL" })
     .optional()
     .or(z.literal("")),
-  timezone: z.nativeEnum(TimezoneValue),
+  timezone: z.nativeEnum(Timezone),
 });
 
 export type UpdateUserValues = z.infer<typeof updateUserSchema>;

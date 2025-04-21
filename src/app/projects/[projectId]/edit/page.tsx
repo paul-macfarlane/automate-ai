@@ -25,11 +25,11 @@ export default async function EditProjectPage({
     return redirect("/projects");
   }
 
-  if (!isProjectEditable(projectWithMember)) {
+  if (!isProjectEditable(projectWithMember.member.role)) {
     return redirect(`/projects/${projectId}`);
   }
 
-  const canDeleteProject = isProjectDeletable(projectWithMember);
+  const canDeleteProject = isProjectDeletable(projectWithMember.member.role);
 
   return (
     <div className="container mx-auto py-10 px-4">

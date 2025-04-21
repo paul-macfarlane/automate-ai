@@ -1,9 +1,6 @@
 "use server";
 
-import {
-  createProjectSchema,
-  type CreateProjectValues,
-} from "@/models/projects";
+import { createProjectSchema, ProjectRole } from "@/models/projects";
 import { auth } from "@/auth";
 import { transaction } from "@/db/transaction";
 import {
@@ -14,6 +11,7 @@ import {
   deleteProject,
 } from "@/db/projects";
 import { isProjectDeletable, isProjectEditable } from "@/services/projects";
+import { z } from "zod";
 
 export type MutateProjectActionResult = {
   success: boolean;
@@ -25,7 +23,7 @@ export type MutateProjectActionResult = {
 };
 
 export async function createProjectAction(
-  values: CreateProjectValues
+  params: unknown
 ): Promise<MutateProjectActionResult> {
   try {
     const session = await auth();
@@ -36,7 +34,7 @@ export async function createProjectAction(
       };
     }
 
-    const validationResult = createProjectSchema.safeParse(values);
+    const validationResult = createProjectSchema.safeParse(params);
     if (!validationResult.success) {
       const fieldErrors: { [key: string]: string[] } = {};
       validationResult.error.errors.forEach((error) => {
@@ -66,7 +64,7 @@ export async function createProjectAction(
       await insertProjectMember(
         {
           userId: session.user!.id!,
-          role: "admin",
+          role: ProjectRole.Admin,
           projectId: project.id,
         },
         tx
@@ -95,9 +93,13 @@ export async function createProjectAction(
   }
 }
 
+export const updateProjectActionParamsSchema = z.object({
+  projectId: z.string(),
+  values: createProjectSchema,
+});
+
 export async function updateProjectAction(
-  projectId: string,
-  values: CreateProjectValues
+  params: unknown
 ): Promise<MutateProjectActionResult> {
   try {
     const session = await auth();
@@ -108,25 +110,7 @@ export async function updateProjectAction(
       };
     }
 
-    const projectWithMember = await selectProjectWithMember({
-      projectId,
-      userId: session.user.id,
-    });
-    if (!projectWithMember) {
-      return {
-        success: false,
-        message: "Project not found.",
-      };
-    }
-
-    if (!isProjectEditable(projectWithMember)) {
-      return {
-        success: false,
-        message: "You do not have permission to update this project.",
-      };
-    }
-
-    const validationResult = createProjectSchema.safeParse(values);
+    const validationResult = updateProjectActionParamsSchema.safeParse(params);
     if (!validationResult.success) {
       const fieldErrors: { [key: string]: string[] } = {};
       validationResult.error.errors.forEach((error) => {
@@ -144,9 +128,29 @@ export async function updateProjectAction(
       };
     }
 
+    const { projectId, values } = validationResult.data;
+
+    const projectWithMember = await selectProjectWithMember({
+      projectId,
+      userId: session.user.id,
+    });
+    if (!projectWithMember) {
+      return {
+        success: false,
+        message: "Project not found.",
+      };
+    }
+
+    if (!isProjectEditable(projectWithMember.member.role)) {
+      return {
+        success: false,
+        message: "You do not have permission to update this project.",
+      };
+    }
+
     await updateProject({
       projectId,
-      values: validationResult.data,
+      values,
     });
 
     return {
@@ -168,8 +172,12 @@ export async function updateProjectAction(
   }
 }
 
+export const deleteProjectActionParamsSchema = z.object({
+  projectId: z.string(),
+});
+
 export async function deleteProjectAction(
-  projectId: string
+  params: unknown
 ): Promise<MutateProjectActionResult> {
   try {
     const session = await auth();
@@ -180,8 +188,17 @@ export async function deleteProjectAction(
       };
     }
 
+    const validationResult = deleteProjectActionParamsSchema.safeParse(params);
+    if (!validationResult.success) {
+      return {
+        success: false,
+        message: "Please fix the errors in the form.",
+        fieldErrors: validationResult.error.flatten().fieldErrors,
+      };
+    }
+
     const projectWithMember = await selectProjectWithMember({
-      projectId,
+      projectId: validationResult.data.projectId,
       userId: session.user.id,
     });
     if (!projectWithMember) {
@@ -191,14 +208,14 @@ export async function deleteProjectAction(
       };
     }
 
-    if (!isProjectDeletable(projectWithMember)) {
+    if (!isProjectDeletable(projectWithMember.member.role)) {
       return {
         success: false,
         message: "You do not have permission to delete this project.",
       };
     }
 
-    await deleteProject(projectId);
+    await deleteProject(validationResult.data.projectId);
 
     return {
       success: true,

@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { ProfileForm } from "@/components/profile-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/utils";
-import { TimezoneValue } from "@/timezones";
 import { getAuthedUser } from "@/services/users";
 
 export default async function ProfilePage({
@@ -61,7 +60,7 @@ export default async function ProfilePage({
               initialFormValues={{
                 name: user.name || "",
                 image: user.image || "",
-                timezone: user.timezone as TimezoneValue,
+                timezone: user.timezone,
               }}
               newUser={newUser}
             />

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { selectUserProjects } from "@/db/projects";
 import { formatDateShort } from "@/dates";
-import { TimezoneValue } from "@/timezones";
 import { getAuthedUser } from "@/services/users";
 
 export default async function ProjectsPage() {
@@ -84,10 +83,7 @@ export default async function ProjectsPage() {
                   {role === "viewer" && <Badge variant="outline">Viewer</Badge>}
                 </div>
                 <span className="text-muted-foreground">
-                  {formatDateShort(
-                    project.updatedAt,
-                    user.timezone as TimezoneValue
-                  )}
+                  {formatDateShort(project.updatedAt, user.timezone)}
                 </span>
               </div>
             </Link>

@@ -1,15 +1,18 @@
-import { ProjectWithMember } from "@/db/projects";
-
 import {
   DELETABLE_PROJECT_ROLES,
   EDITABLE_PROJECT_ROLES,
+  MEMBER_MANAGEMENT_PROJECT_ROLES,
   ProjectRole,
 } from "@/models/projects";
 
-export function isProjectEditable(project: ProjectWithMember) {
-  return EDITABLE_PROJECT_ROLES.includes(project.member.role as ProjectRole);
+export function isProjectEditable(role: ProjectRole) {
+  return EDITABLE_PROJECT_ROLES.includes(role);
 }
 
-export function isProjectDeletable(project: ProjectWithMember) {
-  return DELETABLE_PROJECT_ROLES.includes(project.member.role as ProjectRole);
+export function isProjectDeletable(role: ProjectRole) {
+  return DELETABLE_PROJECT_ROLES.includes(role);
+}
+
+export function areMembersManageable(role: ProjectRole) {
+  return MEMBER_MANAGEMENT_PROJECT_ROLES.includes(role);
 }

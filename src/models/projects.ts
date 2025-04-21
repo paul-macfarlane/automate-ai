@@ -7,9 +7,10 @@ export enum ProjectRole {
 }
 
 export const PROJECT_ROLES = Object.values(ProjectRole);
+
 export const EDITABLE_PROJECT_ROLES = [ProjectRole.Admin, ProjectRole.Editor];
-export const ADMIN_PROJECT_ROLES = [ProjectRole.Admin];
 export const DELETABLE_PROJECT_ROLES = [ProjectRole.Admin];
+export const MEMBER_MANAGEMENT_PROJECT_ROLES = [ProjectRole.Admin];
 
 export const createProjectSchema = z.object({
   title: z

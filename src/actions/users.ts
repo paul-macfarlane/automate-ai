@@ -1,6 +1,6 @@
 "use server";
 
-import { updateUserSchema, type UpdateUserValues } from "@/models/users";
+import { updateUserSchema } from "@/models/users";
 import { auth } from "@/auth";
 import { updateUser } from "@/db/users";
 import { revalidatePath } from "next/cache";
@@ -14,7 +14,7 @@ export type UpdateUserActionResult = {
 };
 
 export async function updateUserAction(
-  values: UpdateUserValues
+  params: unknown
 ): Promise<UpdateUserActionResult> {
   try {
     const session = await auth();
@@ -25,7 +25,7 @@ export async function updateUserAction(
       };
     }
 
-    const validationResult = updateUserSchema.safeParse(values);
+    const validationResult = updateUserSchema.safeParse(params);
     if (!validationResult.success) {
       const fieldErrors: { [key: string]: string[] } = {};
       validationResult.error.errors.forEach((error) => {
