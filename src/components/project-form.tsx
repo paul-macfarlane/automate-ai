@@ -4,13 +4,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createProjectSchema,
+  MutateProjectActionResult,
   type CreateProjectValues,
 } from "@/models/projects";
-import {
-  createProjectAction,
-  updateProjectAction,
-  type MutateProjectActionResult,
-} from "@/actions/projects";
+import { createProjectAction, updateProjectAction } from "@/actions/projects";
 import { toast } from "sonner";
 import { getInitials } from "@/utils";
 import { useFormStatus } from "react-dom";
@@ -79,7 +76,10 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
         let result: MutateProjectActionResult;
         if (isEditing) {
-          result = await updateProjectAction(project.id, values);
+          result = await updateProjectAction({
+            ...values,
+            id: project.id,
+          });
         } else {
           result = await createProjectAction(values);
         }

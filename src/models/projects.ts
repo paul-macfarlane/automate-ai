@@ -30,3 +30,12 @@ export const createProjectSchema = z.object({
 });
 
 export type CreateProjectValues = z.infer<typeof createProjectSchema>;
+
+export type MutateProjectActionResult = {
+  success: boolean;
+  message: string;
+  projectId?: string;
+  fieldErrors?: {
+    [key: string]: string[];
+  };
+};

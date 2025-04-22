@@ -15,3 +15,11 @@ export const updateUserSchema = z.object({
 });
 
 export type UpdateUserValues = z.infer<typeof updateUserSchema>;
+
+export type UpdateUserActionResult = {
+  success: boolean;
+  message: string;
+  fieldErrors?: {
+    [key: string]: string[];
+  };
+};

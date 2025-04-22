@@ -2,8 +2,12 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { updateUserSchema, type UpdateUserValues } from "@/models/users";
-import { updateUserAction, type UpdateUserActionResult } from "@/actions/users";
+import {
+  updateUserSchema,
+  type UpdateUserValues,
+  type UpdateUserActionResult,
+} from "@/models/users";
+import { updateUserAction } from "@/actions/users";
 import { toast } from "sonner";
 import { getInitials } from "@/utils";
 import { useFormStatus } from "react-dom";

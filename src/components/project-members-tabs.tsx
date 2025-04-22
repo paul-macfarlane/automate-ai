@@ -15,7 +15,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ProjectWithMembers } from "@/db/projects";
 import { PROJECT_ROLES, ProjectRole } from "@/models/projects";
-import { useMemo } from "react";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -25,39 +24,55 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  inviteUserAction,
+  revokeInviteAction,
+  searchProjectInviteCandidatesAction,
+} from "@/actions/project-invites";
+import { User } from "@/db/users";
+import { ProjectInvite } from "@/db/project-invites";
+import { useRouter } from "next/navigation";
 
-type ProjectMembersUIProps = {
+type ProjectMembersTabsProps = {
   project: ProjectWithMembers;
   currentUserId: string;
+  pendingInvites?: ProjectInvite[];
 };
 
-export function ProjectMembersUI({
+export function ProjectMembersTabs({
   project,
   currentUserId,
-}: ProjectMembersUIProps) {
+  pendingInvites = [],
+}: ProjectMembersTabsProps) {
+  const router = useRouter();
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<ProjectRole>(ProjectRole.Viewer);
-  const [linkRole, setLinkRole] = useState<ProjectRole>(ProjectRole.Viewer);
-  const [inviteLink, setInviteLink] = useState(
-    `${
-      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-    }/projects/invite/${project.id}?role=viewer`
-  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<User[]>([]);
 
-  const currentUserRole = useMemo(() => {
-    const member = project.members.find(
-      (member) => member.user.id === currentUserId
-    );
-    return member?.role;
-  }, [project.members, currentUserId]);
-
-  const isAdmin = currentUserRole === ProjectRole.Admin;
-
-  const handleSendInvite = (e: React.FormEvent) => {
+  const handleSendInvite = async (e: React.FormEvent) => {
     e.preventDefault();
-    // This would be replaced with actual API call
-    toast.success(`Invitation sent to ${inviteEmail} with ${inviteRole} role`);
-    setInviteEmail("");
+    setIsLoading(true);
+    try {
+      const result = await inviteUserAction({
+        projectId: project.id,
+        email: inviteEmail,
+        role: inviteRole,
+      });
+
+      if (result.success) {
+        toast.success(result.message);
+        setInviteEmail("");
+        router.refresh();
+      } else {
+        toast.error(result.message);
+      }
+    } catch {
+      toast.error("Failed to send invitation. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRoleChange = (memberId: string, newRole: string) => {
@@ -70,18 +85,54 @@ export function ProjectMembersUI({
     toast.success(`Removed ${name} from project`);
   };
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(inviteLink);
-    toast.success("Invite link copied to clipboard");
+  const handleSearchUsers = async (query: string) => {
+    if (query.length < 3) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const result = await searchProjectInviteCandidatesAction({
+        query,
+        projectId: project.id,
+      });
+
+      if (result.success) {
+        setSearchResults(result.users);
+      } else {
+        toast.error(result.message);
+        setSearchResults([]);
+      }
+    } catch {
+      toast.error("Failed to search for users");
+      setSearchResults([]);
+    }
   };
 
-  const updateLinkRole = (role: ProjectRole) => {
-    setLinkRole(role);
-    setInviteLink(
-      `${
-        process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-      }/projects/invite/${project.id}?role=${role}`
-    );
+  const handleSelectUser = (email: string) => {
+    setInviteEmail(email);
+    setSearchResults([]);
+    setSearchQuery("");
+  };
+
+  const handleRevokeInvite = async (inviteId: string) => {
+    setIsLoading(true);
+    try {
+      const result = await revokeInviteAction({
+        inviteId,
+      });
+
+      if (result.success) {
+        toast.success(result.message);
+        router.refresh();
+      } else {
+        toast.error(result.message);
+      }
+    } catch {
+      toast.error("Failed to revoke invitation");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -99,6 +150,7 @@ export function ProjectMembersUI({
         <TabsList>
           <TabsTrigger value="members">Members</TabsTrigger>
           <TabsTrigger value="invite">Invite</TabsTrigger>
+          <TabsTrigger value="pending">Pending Invites</TabsTrigger>
         </TabsList>
 
         <TabsContent value="members">
@@ -141,7 +193,7 @@ export function ProjectMembersUI({
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      {isAdmin && member.user.id !== currentUserId ? (
+                      {member.user.id !== currentUserId ? (
                         <>
                           <Select
                             defaultValue={member.role}
@@ -208,14 +260,52 @@ export function ProjectMembersUI({
                 <form className="space-y-4" onSubmit={handleSendInvite}>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Email Address</label>
-                    <Input
-                      type="email"
-                      placeholder="team@example.com"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
-                      required
-                      className="w-full"
-                    />
+                    <div className="relative">
+                      <Input
+                        type="email"
+                        placeholder="team@example.com"
+                        value={inviteEmail}
+                        onChange={(e) => setInviteEmail(e.target.value)}
+                        required
+                        className="w-full"
+                      />
+                      <Input
+                        type="text"
+                        placeholder="Search users by email..."
+                        value={searchQuery}
+                        onChange={(e) => {
+                          setSearchQuery(e.target.value);
+                          handleSearchUsers(e.target.value);
+                        }}
+                        className="w-full mt-2"
+                      />
+                      {searchResults.length > 0 && (
+                        <div className="absolute z-10 mt-1 w-full bg-background border rounded-md shadow-md max-h-60 overflow-auto">
+                          {searchResults.map((user) => (
+                            <div
+                              key={user.id}
+                              className="p-2 hover:bg-muted cursor-pointer flex items-center gap-2"
+                              onClick={() => handleSelectUser(user.email!)}
+                            >
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage src={user.image || undefined} />
+                                <AvatarFallback>
+                                  {getInitials(user.name || "", "U")}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <div className="text-sm font-medium">
+                                  {user.name}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {user.email}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Role</label>
@@ -248,51 +338,60 @@ export function ProjectMembersUI({
                     </p>
                   </div>
                   <div className="pt-2">
-                    <Button type="submit">Send Invitation</Button>
+                    <Button type="submit" disabled={isLoading}>
+                      {isLoading ? "Sending..." : "Send Invitation"}
+                    </Button>
                   </div>
                 </form>
               </CardContent>
             </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Invite Link</CardTitle>
-                <CardDescription>
-                  Share this link with others to invite them to the project
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2">
-                  <Input value={inviteLink} readOnly className="flex-1" />
-                  <Button variant="outline" onClick={handleCopyLink}>
-                    Copy
-                  </Button>
-                </div>
-                <div className="mt-4">
-                  <label className="text-sm font-medium block mb-2">
-                    Default Role for Link Invites
-                  </label>
-                  <Select
-                    value={linkRole}
-                    onValueChange={(value) =>
-                      updateLinkRole(value as ProjectRole)
-                    }
-                  >
-                    <SelectTrigger className="w-full max-w-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PROJECT_ROLES.map((role) => (
-                        <SelectItem key={role} value={role}>
-                          {role.charAt(0).toUpperCase() + role.slice(1)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="pending">
+          <Card>
+            <CardHeader>
+              <CardTitle>Pending Invitations</CardTitle>
+              <CardDescription>
+                Manage invitations that have not been accepted yet
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {pendingInvites.length === 0 ? (
+                <p className="text-muted-foreground">No pending invitations</p>
+              ) : (
+                <div className="divide-y">
+                  {pendingInvites.map((invite) => (
+                    <div
+                      key={invite.id}
+                      className="py-4 flex items-center justify-between"
+                    >
+                      <div>
+                        <div className="font-medium">{invite.email}</div>
+                        <div className="text-sm text-muted-foreground">
+                          Role:{" "}
+                          {invite.role.charAt(0).toUpperCase() +
+                            invite.role.slice(1)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Expires:{" "}
+                          {new Date(invite.expiresAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleRevokeInvite(invite.id)}
+                        disabled={isLoading}
+                      >
+                        Revoke
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

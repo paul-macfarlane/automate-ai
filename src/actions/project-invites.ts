@@ -22,7 +22,7 @@ import {
 } from "@/models/project-invites";
 import { searchUsersByEmailExcluding, User } from "@/db/users";
 
-export type InviteUserActionResult = {
+type InviteUserActionResult = {
   success: boolean;
   message: string;
   invite?: ProjectInvite;
@@ -128,11 +128,11 @@ export async function inviteUserAction(
   }
 }
 
-export const revokeInviteSchema = z.object({
+const revokeInviteSchema = z.object({
   inviteId: z.string(),
 });
 
-export type RevokeInviteActionResult = {
+type RevokeInviteActionResult = {
   success: boolean;
   message: string;
   fieldErrors?: {
@@ -223,7 +223,7 @@ export async function revokeInviteAction(
   }
 }
 
-export type SearchProjectInviteCandidatesActionResult = {
+type SearchProjectInviteCandidatesActionResult = {
   success: boolean;
   message: string;
   users: User[];
@@ -232,7 +232,7 @@ export type SearchProjectInviteCandidatesActionResult = {
   };
 };
 
-export const searchProjectInviteCandidatesSchema = z.object({
+const searchProjectInviteCandidatesSchema = z.object({
   query: z.string().min(3),
   projectId: z.string(),
 });

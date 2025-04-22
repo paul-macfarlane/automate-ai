@@ -1,17 +1,9 @@
 "use server";
 
-import { updateUserSchema } from "@/models/users";
+import { UpdateUserActionResult, updateUserSchema } from "@/models/users";
 import { auth } from "@/auth";
 import { updateUser } from "@/db/users";
 import { revalidatePath } from "next/cache";
-
-export type UpdateUserActionResult = {
-  success: boolean;
-  message: string;
-  fieldErrors?: {
-    [key: string]: string[];
-  };
-};
 
 export async function updateUserAction(
   params: unknown

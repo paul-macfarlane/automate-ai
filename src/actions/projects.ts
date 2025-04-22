@@ -1,6 +1,10 @@
 "use server";
 
-import { createProjectSchema, ProjectRole } from "@/models/projects";
+import {
+  createProjectSchema,
+  MutateProjectActionResult,
+  ProjectRole,
+} from "@/models/projects";
 import { auth } from "@/auth";
 import { transaction } from "@/db/transaction";
 import {
@@ -12,15 +16,6 @@ import {
 } from "@/db/projects";
 import { isProjectDeletable, isProjectEditable } from "@/services/projects";
 import { z } from "zod";
-
-export type MutateProjectActionResult = {
-  success: boolean;
-  message: string;
-  projectId?: string;
-  fieldErrors?: {
-    [key: string]: string[];
-  };
-};
 
 export async function createProjectAction(
   params: unknown
@@ -93,7 +88,7 @@ export async function createProjectAction(
   }
 }
 
-export const updateProjectActionParamsSchema = z.object({
+const updateProjectActionParamsSchema = z.object({
   projectId: z.string(),
   values: createProjectSchema,
 });
@@ -172,7 +167,7 @@ export async function updateProjectAction(
   }
 }
 
-export const deleteProjectActionParamsSchema = z.object({
+const deleteProjectActionParamsSchema = z.object({
   projectId: z.string(),
 });
 
