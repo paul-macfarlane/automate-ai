@@ -6,6 +6,8 @@ import { selectProjectWithMembers } from "@/db/projects";
 import { formatDateShort } from "@/dates";
 import { getAuthedUser } from "@/services/users";
 import { isProjectEditable, areMembersManageable } from "@/services/projects";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default async function ProjectPage({
   params,
@@ -113,19 +115,15 @@ export default async function ProjectPage({
             <h2 className="text-xl font-semibold mb-4">Admin Actions</h2>
             <div className="flex flex-col gap-3 sm:flex-row">
               {canManageMembers && (
-                <a
-                  href={`/projects/${project.id}/members`}
-                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
-                >
-                  Manage Members
-                </a>
+                <Button variant="outline" asChild>
+                  <Link href={`/projects/${project.id}/members/manage`}>
+                    Manage Members
+                  </Link>
+                </Button>
               )}
-              <a
-                href={`/projects/${project.id}/edit`}
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground hover:bg-secondary/90 h-10 px-4 py-2"
-              >
-                Edit Project
-              </a>
+              <Button variant="outline" asChild>
+                <Link href={`/projects/${project.id}/edit`}>Edit Project</Link>
+              </Button>
             </div>
           </div>
         )}
