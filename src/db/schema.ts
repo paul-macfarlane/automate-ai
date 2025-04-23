@@ -7,7 +7,7 @@ import {
 import { relations, sql } from "drizzle-orm";
 import type { AdapterAccount as AdapterAccountType } from "next-auth/adapters";
 import { TIMEZONES, Timezone } from "@/timezones";
-import { PROJECT_ROLES, ProjectRole } from "@/models/projects";
+import { PROJECT_ROLES, ProjectRole } from "@/models/project-members";
 import { PROJECT_INVITE_STATUSES } from "@/models/project-invites";
 import { ProjectInviteStatus } from "@/models/project-invites";
 

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ProjectRole } from "./projects";
+import { ProjectRole } from "./project-members";
 
 export enum ProjectInviteStatus {
   Pending = "pending",

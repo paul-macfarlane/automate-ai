@@ -18,8 +18,8 @@ import {
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/utils";
-import { ProjectRole } from "@/models/projects";
-import { PROJECT_ROLES } from "@/models/projects";
+import { ProjectRole } from "@/models/project-members";
+import { PROJECT_ROLES } from "@/models/project-members";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { User } from "@/db/users";

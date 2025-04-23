@@ -4,9 +4,9 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import {
   selectProjectWithMember,
-  selectProjectMemberByEmail,
   selectProjectWithMembers,
 } from "@/db/projects";
+import { selectProjectMemberByEmail } from "@/db/project-members";
 import { areMembersManageable } from "@/services/projects";
 import {
   insertProjectInvite,

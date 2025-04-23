@@ -1,5 +1,5 @@
-import { eq, desc, count, and } from "drizzle-orm";
-import { projects, projectMembers, users } from "./schema";
+import { eq, desc, count } from "drizzle-orm";
+import { projects, projectMembers } from "./schema";
 import {
   withDb,
   withTransaction,
@@ -7,10 +7,9 @@ import {
   TransactionContext,
 } from "./transaction";
 import { User } from "./users";
+import { ProjectMember } from "./project-members";
 
 export type Project = typeof projects.$inferSelect;
-export type ProjectMember = typeof projectMembers.$inferSelect;
-
 export type UserProject = {
   project: Project;
   role: ProjectMember["role"];
@@ -162,29 +161,5 @@ export const selectProjectWithMember = withDb(
 export const deleteProject = withTransaction(
   async (tx: TransactionContext, projectId: string): Promise<void> => {
     await tx.delete(projects).where(eq(projects.id, projectId));
-  }
-);
-
-export type SelectProjectMemberByEmailParams = {
-  email: string;
-  projectId: string;
-};
-
-export const selectProjectMemberByEmail = withDb(
-  async (
-    dbContext: DbContext,
-    { email, projectId }: SelectProjectMemberByEmailParams
-  ): Promise<ProjectMember | undefined> => {
-    const queryResult = await dbContext
-      .select({
-        projectMember: projectMembers,
-      })
-      .from(projectMembers)
-      .innerJoin(users, eq(projectMembers.userId, users.id))
-      .where(
-        and(eq(projectMembers.projectId, projectId), eq(users.email, email))
-      );
-
-    return queryResult[0]?.projectMember;
   }
 );

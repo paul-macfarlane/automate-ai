@@ -20,7 +20,12 @@ import {
 import { toast } from "sonner";
 import { ProjectWithMembers } from "@/db/projects";
 import { getInitials } from "@/utils";
-import { PROJECT_ROLES } from "@/models/projects";
+import { PROJECT_ROLES } from "@/models/project-members";
+import { useRouter } from "next/navigation";
+import {
+  updateProjectMemberAction,
+  removeProjectMemberAction,
+} from "@/actions/project-members";
 
 export type ManageMembersTabProps = {
   project: ProjectWithMembers;
@@ -31,14 +36,43 @@ export default function ManageMembersTab({
   project,
   currentUserId,
 }: ManageMembersTabProps) {
-  const handleRoleChange = (memberId: string, newRole: string) => {
-    // This would be replaced with actual API call
-    toast.success(`Role updated to ${newRole}`);
+  const router = useRouter();
+
+  const handleRoleChange = async (memberId: string, newRole: string) => {
+    try {
+      const result = await updateProjectMemberAction({
+        projectId: project.id,
+        memberId,
+        role: newRole,
+      });
+
+      if (result.success) {
+        toast.success(result.message);
+        router.refresh();
+      } else {
+        toast.error(result.message);
+      }
+    } catch {
+      toast.error("Failed to update member role");
+    }
   };
 
-  const handleRemoveMember = (memberId: string, name: string) => {
-    // This would be replaced with actual API call
-    toast.success(`Removed ${name} from project`);
+  const handleRemoveMember = async (memberId: string, name: string) => {
+    try {
+      const result = await removeProjectMemberAction({
+        projectId: project.id,
+        memberId,
+      });
+
+      if (result.success) {
+        toast.success(result.message);
+        router.refresh();
+      } else {
+        toast.error(result.message);
+      }
+    } catch {
+      toast.error(`Failed to remove ${name}`);
+    }
   };
 
   return (

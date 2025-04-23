@@ -3,7 +3,7 @@ import {
   EDITABLE_PROJECT_ROLES,
   MEMBER_MANAGEMENT_PROJECT_ROLES,
   ProjectRole,
-} from "@/models/projects";
+} from "@/models/project-members";
 
 export function isProjectEditable(role: ProjectRole) {
   return EDITABLE_PROJECT_ROLES.includes(role);

@@ -3,8 +3,8 @@
 import {
   createProjectSchema,
   MutateProjectActionResult,
-  ProjectRole,
 } from "@/models/projects";
+import { ProjectRole } from "@/models/project-members";
 import { auth } from "@/auth";
 import { transaction } from "@/db/transaction";
 import {
@@ -171,9 +171,15 @@ const deleteProjectActionParamsSchema = z.object({
   projectId: z.string(),
 });
 
+type DeleteProjectActionResult = {
+  success: boolean;
+  message: string;
+  fieldErrors?: { [key: string]: string[] };
+};
+
 export async function deleteProjectAction(
   params: unknown
-): Promise<MutateProjectActionResult> {
+): Promise<DeleteProjectActionResult> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
