@@ -6,6 +6,7 @@ Automanager is a modern project management platform designed to streamline colla
 
 - **Project Management**: Create, view, and manage projects with detailed information
 - **Role-Based Access Control**: Assign team members as admins, editors, or viewers
+- **Team Collaboration**: Send and manage project invitations to team members
 - **User Profiles**: Personalize your account with display name and profile picture
 - **Modern UI**: Clean, responsive interface with dark mode support
 - **Authentication**: Secure login system with session management
@@ -74,43 +75,47 @@ automanager/
 │   ├── app/            # Next.js App Router pages
 │   ├── components/     # UI components
 │   ├── db/             # Database schema and configuration
-│   │   └── schema/     # Drizzle ORM schema definitions
-│   └── lib/            # Utility functions and validations
-│       └── models/     # Data models and Zod validation schemas
+│   ├── models/         # Data models and Zod validation schemas
+│   └── services/       # Business logi
 ├── docs/               # Documentation
-│   ├── form-pattern.md # Form and server action patterns
-│   └── database-patterns.md # Database abstraction patterns
+│   ├── database-patterns.md # Database abstraction patterns
+│   ├── form-pattern.md      # Form and server action patterns
+│   ├── project-invites.md   # Project invitation system
+│   └── theming.md           # Styling and theme guidelines
 ├── public/             # Static assets
 └── README.md           # This file
 ```
 
 ## Development Guidelines
 
-### Database Patterns
+Our development documentation provides detailed guidance on standard patterns and practices used throughout the codebase:
 
-We use a standardized approach to database operations that balances performance and data integrity. See [Database Patterns Guide](docs/database-patterns.md) for details on:
+### [Database Patterns](docs/database-patterns.md)
 
-- Using transaction contexts for data operations
-- Working with the `withDb` and `withTransaction` utilities
-- Naming conventions and best practices
-- Type definitions and error handling
+Comprehensive guide on our database abstraction approach, including:
 
-### Form Patterns
+- Transaction management for data integrity
+- TypeScript-first approach with proper type definitions
+- Query optimization strategies
+- Error handling best practices
 
-We follow a standardized pattern for handling forms and server actions. See [Form Pattern Documentation](docs/form-pattern.md) for details on how to:
+### [Form & Server Action Patterns](docs/form-pattern.md)
 
-- Create validation schemas with Zod
-- Implement server actions with proper error handling
-- Build form components with React Hook Form
-- Manage form state and server communication
+Detailed documentation on implementing forms with server actions:
 
-### Styling Guidelines
+- Type-safe form validation with Zod
+- React Hook Form integration
+- Error handling and state management
+- Consistent user feedback patterns
 
-We use Tailwind CSS for styling components. Key conventions:
+### [Theming & Styling Guidelines](docs/theming.md)
 
-- Use the provided theme variables (e.g., `bg-background`, `text-foreground`)
-- Support both light and dark modes using the theme variables
-- Maintain consistent spacing and component sizes
+Complete guide to our theming system:
+
+- CSS variable approach for consistent design
+- Dark mode implementation
+- Component styling patterns
+- Accessibility considerations
 
 ## Contributing
 
