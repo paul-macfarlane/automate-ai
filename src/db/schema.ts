@@ -127,9 +127,6 @@ export const projects = sqliteTable("projects", {
   title: text("title").notNull(),
   description: text("description"),
   icon: text("icon"),
-  createdById: text("created_by_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`),

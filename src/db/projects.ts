@@ -69,7 +69,6 @@ export const insertProject = withTransaction(
         title: values.title,
         description: values.description || null,
         icon: values.icon || null,
-        createdById: values.createdById,
       })
       .returning();
 

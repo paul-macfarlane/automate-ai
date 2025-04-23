@@ -48,13 +48,7 @@ export async function createProjectAction(
     }
 
     const project = await transaction(async (tx) => {
-      const project = await insertProject(
-        {
-          ...validationResult.data,
-          createdById: session.user!.id!,
-        },
-        tx
-      );
+      const project = await insertProject(validationResult.data, tx);
 
       await insertProjectMember(
         {

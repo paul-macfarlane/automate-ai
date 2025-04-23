@@ -113,7 +113,6 @@ export function withDb<TParams, TResult>(
  *       id: projectId,
  *       title,
  *       description: description || null,
- *       createdById: userId,
  *     });
  *
  *     return { projectId };
