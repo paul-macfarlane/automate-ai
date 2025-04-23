@@ -14,7 +14,7 @@
   - [x] add ability to remove members or change their roles
     - [x] handle edge case where user removes themselves, for now just prevent user from removing themselves
     - [x] better separate project and project member code in db and action and model
-- [] re-update documentation
+- [x] re-update documentation
 - [] add ability to add/update/delete tasks
 - [] add ability to leave project IF other project admin exists
 - [] add ability to deactivate/delete account
