@@ -17,3 +17,8 @@ export const inviteUserSchema = z.object({
 });
 
 export const INVITE_EXPIRATION_TIME_MS = 1000 * 60 * 60 * 24 * 30; // 7 days
+
+export enum InviteResponse {
+  Accept = "accept",
+  Decline = "decline",
+}

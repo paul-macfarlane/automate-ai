@@ -9,7 +9,8 @@
 - [x] allow ability to edit project for admins and editors
 - [] add members management page or modal (wip)
   - [x] add ability to invite members
-  - [] add ability for people to accept/decline invites
+  - [x] add ability for people to accept/decline invites
+    - [] add ability for users not yet in the platform to get invites after they sign up
   - [x] add ability to remove members or change their roles
     - [x] handle edge case where user removes themselves, for now just prevent user from removing themselves
     - [x] better separate project and project member code in db and action and model

@@ -77,8 +77,8 @@ export function ProjectForm({ project }: ProjectFormProps) {
         let result: MutateProjectActionResult;
         if (isEditing) {
           result = await updateProjectAction({
-            ...values,
-            id: project.id,
+            values,
+            projectId: project.id,
           });
         } else {
           result = await createProjectAction(values);

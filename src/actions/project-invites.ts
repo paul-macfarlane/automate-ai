@@ -14,13 +14,18 @@ import {
   selectProjectInvite,
   selectProjectInviteByEmailAndStatus,
   updateProjectInvite,
+  selectUserInvitesByEmailAndStatus,
+  ProjectInviteWithInviter,
 } from "@/db/project-invites";
 import {
   inviteUserSchema,
   ProjectInviteStatus,
   INVITE_EXPIRATION_TIME_MS,
+  InviteResponse,
 } from "@/models/project-invites";
 import { searchUsersByEmailExcluding, User } from "@/db/users";
+import { insertProjectMember } from "@/db/projects";
+import { transaction } from "@/db/transaction";
 
 type InviteUserActionResult = {
   success: boolean;
@@ -319,6 +324,166 @@ export async function searchProjectInviteCandidatesAction(
       success: false,
       message: "An unexpected error occurred. Please try again later.",
       users: [],
+    };
+  }
+}
+
+const respondToInviteSchema = z.object({
+  inviteId: z.string(),
+  response: z.nativeEnum(InviteResponse),
+});
+
+type RespondToInviteActionResult = {
+  success: boolean;
+  message: string;
+  projectId?: string;
+  fieldErrors?: {
+    [key: string]: string[];
+  };
+};
+
+export async function respondToInviteAction(
+  params: unknown
+): Promise<RespondToInviteActionResult> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        message: "You must be logged in to respond to invitations.",
+      };
+    }
+
+    const validationResult = respondToInviteSchema.safeParse(params);
+    if (!validationResult.success) {
+      const fieldErrors: { [key: string]: string[] } = {};
+      validationResult.error.errors.forEach((error) => {
+        const field = error.path[0] as string;
+        if (!fieldErrors[field]) {
+          fieldErrors[field] = [];
+        }
+        fieldErrors[field].push(error.message);
+      });
+
+      return {
+        success: false,
+        message: "Please fix the errors in the form.",
+        fieldErrors,
+      };
+    }
+
+    const { inviteId, response } = validationResult.data;
+
+    const invite = await selectProjectInvite(inviteId);
+    if (!invite) {
+      return {
+        success: false,
+        message: "Invitation not found.",
+      };
+    }
+
+    if (new Date() > invite.expiresAt) {
+      return {
+        success: false,
+        message: "This invitation has expired.",
+      };
+    }
+
+    if (invite.email !== session.user.email) {
+      return {
+        success: false,
+        message: "This invitation is not for your account.",
+      };
+    }
+
+    if (invite.status !== ProjectInviteStatus.Pending) {
+      return {
+        success: false,
+        message: "This invitation has already been processed.",
+      };
+    }
+
+    if (response === InviteResponse.Accept) {
+      await transaction(async (tx) => {
+        await updateProjectInvite(
+          {
+            inviteId,
+            inviteeId: session.user!.id,
+            status: ProjectInviteStatus.Accepted,
+          },
+          tx
+        );
+
+        await insertProjectMember(
+          {
+            userId: session.user!.id!,
+            projectId: invite.projectId,
+            role: invite.role,
+          },
+          tx
+        );
+      });
+
+      return {
+        success: true,
+        message: "You have successfully joined the project.",
+        projectId: invite.projectId as string,
+      };
+    } else {
+      await updateProjectInvite({
+        inviteId,
+        inviteeId: session.user!.id,
+        status: ProjectInviteStatus.Rejected,
+      });
+
+      return {
+        success: true,
+        message: "You have declined the invitation.",
+      };
+    }
+  } catch (error) {
+    console.error("Error responding to invitation:", error);
+    return {
+      success: false,
+      message: "An unexpected error occurred. Please try again later.",
+    };
+  }
+}
+
+type GetUserPendingInvitesActionResult = {
+  success: boolean;
+  message: string;
+  invites: ProjectInviteWithInviter[];
+};
+
+export async function getUserPendingInvitesAction(): Promise<GetUserPendingInvitesActionResult> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id || !session.user.email) {
+      return {
+        success: false,
+        message: "You must be logged in to get your pending invites.",
+        invites: [],
+      };
+    }
+
+    const pendingInvites = await selectUserInvitesByEmailAndStatus({
+      email: session.user.email,
+      status: ProjectInviteStatus.Pending,
+      expiresAfter: new Date(),
+    });
+
+    return {
+      success: true,
+      message: "Pending invites fetched successfully.",
+      invites: pendingInvites,
+    };
+  } catch (error) {
+    console.error("Error fetching user invites:", error);
+    return {
+      success: false,
+      message: "An unexpected error occurred. Please try again later.",
+      invites: [],
     };
   }
 }

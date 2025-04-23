@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { selectUserProjects } from "@/db/projects";
 import { formatDateShort } from "@/dates";
 import { getAuthedUser } from "@/services/users";
+import { getUserPendingInvitesAction } from "@/actions/project-invites";
+import { PendingInvites } from "@/components/pending-invites";
 
 export default async function ProjectsPage() {
   const user = await getAuthedUser();
@@ -15,6 +17,7 @@ export default async function ProjectsPage() {
   }
 
   const userProjects = await selectUserProjects(user.id);
+  const { invites } = await getUserPendingInvitesAction();
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -31,6 +34,12 @@ export default async function ProjectsPage() {
           <Link href="/projects/new">Create New Project</Link>
         </Button>
       </div>
+
+      {invites.length > 0 && (
+        <div className="mb-8">
+          <PendingInvites invites={invites} />
+        </div>
+      )}
 
       {userProjects.length === 0 ? (
         <div className="text-center p-12 border border-dashed rounded-lg">
