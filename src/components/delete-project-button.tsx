@@ -33,7 +33,7 @@ export default function DeleteProjectButton({
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const result = await deleteProjectAction(projectId);
+      const result = await deleteProjectAction({ projectId });
 
       if (result.success) {
         toast.success(result.message);
